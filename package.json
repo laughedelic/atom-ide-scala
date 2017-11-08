@@ -16,6 +16,8 @@
     "language-server",
     "language-server-protocol"
   ],
+  "repository": "https://github.com/laughedelic/atom-ide-scala",
+  "bugs": "https://github.com/laughedelic/atom-ide-scala/issues",
   "license": "LGPL-3.0+",
   "engines": {
     "atom": ">=1.21.0 <2.0.0"
