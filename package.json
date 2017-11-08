@@ -1,0 +1,48 @@
+{
+  "name": "ide-scala",
+  "main": "./lib/main",
+  "version": "0.0.0",
+  "description": "Scala language support for Atom IDE using Scalameta language server",
+  "author": {
+    "name": "Alexey Alekhin",
+    "email": "laughedelic@gmail.com",
+    "url": "https://github.com/laughedelic"
+  },
+  "keywords": [
+    "scala",
+    "scalameta",
+    "ide",
+    "atom-ide",
+    "language-server",
+    "language-server-protocol"
+  ],
+  "license": "LGPL-3.0+",
+  "engines": {
+    "atom": ">=1.21.0 <2.0.0"
+  },
+  "enhancedScopes": [
+    "source.scala"
+  ],
+  "dependencies": {
+    "atom-languageclient": "0.6.7"
+  },
+  "consumedServices": {
+    "linter-indie": {
+      "versions": {
+        "2.0.0": "consumeLinterV2"
+      }
+    }
+  },
+  "providedServices": {
+    "definitions": {
+      "versions": {
+        "0.1.0": "provideDefinitions"
+      }
+    },
+    "hyperclick": {
+      "versions": {
+        "0.1.0": "provideHyperclick"
+      }
+    }
+  }
+}
