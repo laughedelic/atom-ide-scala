@@ -36,7 +36,7 @@
     },
     "datatip": {
       "versions": {
-        "0.1.0": "consumeDatatipService"
+        "0.1.0": "consumeDatatip"
       }
     }
   },
