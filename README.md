@@ -10,6 +10,30 @@
 
 This project is in very early stage and is not ready for daily usage yet. Nevertheless you are welcome to try it out and provide any feedback either in the [Gitter chat](https://gitter.im/laughedelic/atom-ide-scala) or [Github issues](https://github.com/laughedelic/atom-ide-scala/issues).
 
+### Features
+
+Here is a list of the features which are implemented. It doesn't mean that they work well, just that they are implemented on the server side and supported by this plugin.
+
+* [Formatting](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/code-format.md) with [Scalafmt](http://scalameta.org/scalafmt):
+  + Add [Scalafmt config](http://scalameta.org/scalafmt/#Configuration) to the project
+  + Use <kbd>cmd</kbd><kbd>shift</kbd><kbd>C</kbd> hotkey
+  + It formats the whole file
+* [Definitions](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/definitions.md):
+  + It works only on the sources inside the project
+  + Hold <kbd>cmd</kbd> and hover to preview the definition
+  + Hold <kbd>cmd</kbd> and click to jump to the definition
+* [Datatips](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/datatips.md) (type on hover):
+  + Just hover over a symbol to see its type
+  + You can also hold <kbd>alt</kbd> to see the type of symbol under the cursor
+* [Outline view](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/outline-view.md) (symbols list):
+  + Use <kbd>alt</kbd><kbd>O</kbd> to open it
+* Auto completions as you type with presentation compiler
+  + This requires running `*:scalametaEnableCompletions` in sbt first
+
+See also other default Atom IDE [keybindings](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/keybindings.md).
+
+For the full list of implemented and planned features see the [server roadmap](https://github.com/scalameta/language-server/blob/master/README.md#roadmap).
+
 
 ### Development setup
 
@@ -36,10 +60,11 @@ This project is in very early stage and is not ready for daily usage yet. Nevert
 
     Or use <kbd>cmd</kbd><kbd>shift</kbd><kbd>O</kbd> hotkey in a running Atom.
 
+    Remember that in every project you need to add SemanticDB settings first. See instructions [here](http://scalameta.org/tutorial/#sbt). This is mentioned in the linked above server setup instructions.
 
 #### Debugging
 
-Open Developer Console with  and run there
+Open Developer Console with <kbd>cmd</kbd><kbd>alt</kbd><kbd>I</kbd>  and run there
 
 ```
 atom.config.set('core.debugLSP', true)
