@@ -50,6 +50,21 @@
       "versions": {
         "0.1.0": "provideHyperclick"
       }
+    },
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "provideAutocomplete"
+      }
+    },
+    "code-format.range": {
+      "versions": {
+        "0.1.0": "provideCodeFormat"
+      }
+    },
+    "outline-view": {
+      "versions": {
+        "0.1.0": "provideOutlines"
+      }
     }
   }
 }
