@@ -42,10 +42,8 @@ class ScalaLanguageClient extends AutoLanguageClient {
     )
 
     val javaBin = Path.join(javaHome, "bin", "java")
-    val logLevel = "DEBUG"
     val javaArgs = js.Array(
       s"-Dvscode.workspace=${projectPath}",
-      s"-Dvscode.logLevel=${logLevel}",
       "-jar", coursierJar
     ).concat(coursierArgs)
 
