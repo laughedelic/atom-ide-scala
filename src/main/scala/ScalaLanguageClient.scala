@@ -5,6 +5,7 @@ import io.scalajs.nodejs.child_process.ChildProcess
 import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
 import facade.atom_languageclient._
+import facade.atom_ide.busy_signal._
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
 
@@ -59,10 +60,10 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     client.updateBusyMessage()
   }
 
-  private var busySignal: js.Any = js.undefined
-  private var busyMessage: js.Any = js.undefined
+  private var busySignal: BusySignalService = null
+  private var busyMessage: Option[BusyMessage] = None
 
-  def consumeBusySignal(service: js.Any): Unit = {
+  def consumeBusySignal(service: BusySignalService): Unit = {
     client.busySignal = service
   }
 
@@ -73,19 +74,19 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     init: Boolean = false,
     reveal: Boolean = false
   ): Unit = {
-    if (client.busyMessage != js.undefined) {
-      if (text.isEmpty) {
-        client.busyMessage.asInstanceOf[js.Dynamic].dispose()
-        client.busyMessage = js.undefined
-      } else {
-        client.busyMessage.asInstanceOf[js.Dynamic].setTitle(
-          client.busyMessageFormat(text)
+    client.busyMessage match {
+      case Some(message) =>
+        if (text.isEmpty) {
+          message.dispose()
+          client.busyMessage = None
+        } else {
+          message.setTitle( client.busyMessageFormat(text) )
+        }
+      case None => if (init) {
+        client.busyMessage = Some(
+          client.busySignal.reportBusy( client.busyMessageFormat(text) )
         )
       }
-    } else if (init) {
-      client.busyMessage = client.busySignal.asInstanceOf[js.Dynamic].reportBusy(
-        client.busyMessageFormat(text)
-      )
     }
   }
 

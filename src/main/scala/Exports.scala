@@ -2,6 +2,7 @@ package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.annotation._, js.Dynamic.global
 import facade.atom_languageclient._
+import facade.atom_ide.busy_signal._
 
 // NOTE: This is pure boilerplate. We need it because we can't simply say `module.exports = new ScalaLanguageClient();`
 object Exports {
@@ -30,6 +31,6 @@ object Exports {
   @JSExportTopLevel("consumeLinterV2")
   def consumeLinterV2(registerIndie: js.Any): Unit = client.consumeLinterV2(registerIndie)
   @JSExportTopLevel("consumeBusySignal")
-  def consumeBusySignal(service: js.Any): Unit = client.consumeBusySignal(service)
+  def consumeBusySignal(service: BusySignalService): Unit = client.consumeBusySignal(service)
 
 }
