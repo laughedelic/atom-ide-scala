@@ -58,4 +58,10 @@ class ScalaLanguageClient extends AutoLanguageClient {
     })
     serverProcess
   }
+
+  def filterChangeWatchedFiles(filePath: String): Boolean = {
+    filePath.endsWith(".semanticdb") ||
+    filePath.endsWith(".compilerconfig")
+  }
+
 }
