@@ -6,32 +6,6 @@ import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
 import facade.atom_languageclient._
 
-object Exports {
-  @JSExportTopLevel("client")
-  val client = new ScalaLanguageClient()
-
-  @JSExportTopLevel("activate")
-  def activate(): Unit = client.activate()
-  @JSExportTopLevel("deactivate")
-  def deactivate(): js.Promise[js.Any] = client.deactivate()
-
-  @JSExportTopLevel("provideOutlines")
-  def provideOutlines(): js.Any = client.provideOutlines()
-  @JSExportTopLevel("provideDefinitions")
-  def provideDefinitions(): js.Any = client.provideDefinitions()
-  @JSExportTopLevel("provideCodeFormat")
-  def provideCodeFormat(): js.Any = client.provideCodeFormat()
-  @JSExportTopLevel("provideAutocomplete")
-  def provideAutocomplete(): js.Any = client.provideAutocomplete()
-
-  @JSExportTopLevel("consumeDatatip")
-  def consumeDatatip(service: js.Any): Unit =
-    client.consumeDatatip(service)
-  @JSExportTopLevel("consumeLinterV2")
-  def consumeLinterV2(registerIndie: js.Any): Unit =
-    client.consumeLinterV2(registerIndie)
-}
-
 class ScalaLanguageClient extends AutoLanguageClient {
 
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
