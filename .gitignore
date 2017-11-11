@@ -65,3 +65,21 @@ typings/
 # End of https://www.gitignore.io/api/node
 
 coursier
+
+target/
+artifacts/
+project/project/
+workingDir/
+
+# IntelliJ Idea
+.idea/
+.idea_modules/
+src/main/main.iml
+lib/
+*.pem
+
+.tags*
+.ensime*
+.classpath*
+.atom*
+.imdone*
