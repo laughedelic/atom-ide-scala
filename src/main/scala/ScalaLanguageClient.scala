@@ -56,7 +56,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     busySignal.update(
       text = "initializing language server...",
       init = true,
-      reveal = true
+      reveal = false
     )
   }
 
@@ -64,6 +64,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     busySignal.clear()
   }
 
+  // Is there any better way to consume this service?
   private var busySignal: BusySignal = null
   def consumeBusySignal(service: BusySignalService): Unit = {
     client.busySignal = BusySignal(service, client.getServerName)

@@ -1,5 +1,6 @@
 package laughedelic.atom.ide.scala
 
+import scala.scalajs.js
 import facade.atom_ide.busy_signal._
 
 case class BusySignal(service: BusySignalService, name: String) {
@@ -12,16 +13,18 @@ case class BusySignal(service: BusySignalService, name: String) {
     init: Boolean = false,
     reveal: Boolean = false
   ): Unit = tooltip match {
-    case Some(message) =>
-      if (text.isEmpty) {
-        message.dispose()
+    case Some(tip) =>
+      if (text.nonEmpty) tip.setTitle(formatMessage(text))
+      else {
+        tip.dispose()
         tooltip = None
-      } else {
-        message.setTitle( formatMessage(text) )
       }
     case None => if (init) {
       tooltip = Some(
-        service.reportBusy( formatMessage(text) )
+        service.reportBusy(
+          formatMessage(text),
+          js.Dynamic.literal("revealTooltip" -> reveal)
+        )
       )
     }
   }
