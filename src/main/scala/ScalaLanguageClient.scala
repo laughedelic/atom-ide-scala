@@ -53,41 +53,20 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   }
 
   override def preInitialization(connection: js.Any): Unit = {
-    client.updateBusyMessage("initializing server", true, true)
+    busySignal.update(
+      text = "initializing language server...",
+      init = true,
+      reveal = true
+    )
   }
 
   override def postInitialization(server: js.Any): Unit = {
-    client.updateBusyMessage()
+    busySignal.clear()
   }
 
-  private var busySignal: BusySignalService = null
-  private var busyMessage: Option[BusyMessage] = None
-
+  private var busySignal: BusySignal = null
   def consumeBusySignal(service: BusySignalService): Unit = {
-    client.busySignal = service
-  }
-
-  private def busyMessageFormat(text: String) = s"${client.getServerName()}: ${text}"
-
-  def updateBusyMessage(
-    text: String = "",
-    init: Boolean = false,
-    reveal: Boolean = false
-  ): Unit = {
-    client.busyMessage match {
-      case Some(message) =>
-        if (text.isEmpty) {
-          message.dispose()
-          client.busyMessage = None
-        } else {
-          message.setTitle( client.busyMessageFormat(text) )
-        }
-      case None => if (init) {
-        client.busyMessage = Some(
-          client.busySignal.reportBusy( client.busyMessageFormat(text) )
-        )
-      }
-    }
+    client.busySignal = BusySignal(service, client.getServerName)
   }
 
 }
