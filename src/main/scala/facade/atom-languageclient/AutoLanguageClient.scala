@@ -30,4 +30,8 @@ class AutoLanguageClient extends js.Object {
   val processStdErr: String = js.native
   def captureServerErrors(childProcess: ChildProcess): Unit = js.native
   def handleSpawnFailure(err: js.Any): Unit = js.native
+  def filterChangeWatchedFiles(filePath: String): Boolean = js.native
+  // TODO: better types
+  def preInitialization(connection: js.Any): Unit = js.native
+  def postInitialization(server: js.Any): Unit = js.native
 }

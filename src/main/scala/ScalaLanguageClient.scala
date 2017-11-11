@@ -6,7 +6,7 @@ import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
 import facade.atom_languageclient._
 
-class ScalaLanguageClient extends AutoLanguageClient {
+class ScalaLanguageClient extends AutoLanguageClient { client =>
 
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
   override def getLanguageName(): String = "Scala"
@@ -39,16 +39,54 @@ class ScalaLanguageClient extends AutoLanguageClient {
     global.console.log(javaArgs.mkString(javaBin, "\n", ""))
 
     val serverProcess = ChildProcess.spawn(javaBin, javaArgs)
-    this.captureServerErrors(serverProcess)
+    client.captureServerErrors(serverProcess)
     serverProcess.on("exit", { err: js.Any =>
-      this.handleSpawnFailure(this.processStdErr)
+      client.handleSpawnFailure(client.processStdErr)
     })
     serverProcess
   }
 
-  def filterChangeWatchedFiles(filePath: String): Boolean = {
+  override def filterChangeWatchedFiles(filePath: String): Boolean = {
     filePath.endsWith(".semanticdb") ||
     filePath.endsWith(".compilerconfig")
+  }
+
+  override def preInitialization(connection: js.Any): Unit = {
+    client.updateBusyMessage("initializing server", true, true)
+  }
+
+  override def postInitialization(server: js.Any): Unit = {
+    client.updateBusyMessage()
+  }
+
+  private var busySignal: js.Any = js.undefined
+  private var busyMessage: js.Any = js.undefined
+
+  def consumeBusySignal(service: js.Any): Unit = {
+    client.busySignal = service
+  }
+
+  private def busyMessageFormat(text: String) = s"${client.getServerName()}: ${text}"
+
+  def updateBusyMessage(
+    text: String = "",
+    init: Boolean = false,
+    reveal: Boolean = false
+  ): Unit = {
+    if (client.busyMessage != js.undefined) {
+      if (text.isEmpty) {
+        client.busyMessage.asInstanceOf[js.Dynamic].dispose()
+        client.busyMessage = js.undefined
+      } else {
+        client.busyMessage.asInstanceOf[js.Dynamic].setTitle(
+          client.busyMessageFormat(text)
+        )
+      }
+    } else if (init) {
+      client.busyMessage = client.busySignal.asInstanceOf[js.Dynamic].reportBusy(
+        client.busyMessageFormat(text)
+      )
+    }
   }
 
 }

@@ -29,5 +29,7 @@ object Exports {
   def consumeDatatip(service: js.Any): Unit = client.consumeDatatip(service)
   @JSExportTopLevel("consumeLinterV2")
   def consumeLinterV2(registerIndie: js.Any): Unit = client.consumeLinterV2(registerIndie)
+  @JSExportTopLevel("consumeBusySignal")
+  def consumeBusySignal(service: js.Any): Unit = client.consumeBusySignal(service)
 
 }
