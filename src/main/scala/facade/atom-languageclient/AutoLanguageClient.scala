@@ -8,7 +8,17 @@ import io.scalajs.nodejs.child_process.ChildProcess
 class AutoLanguageClient extends js.Object {
   // Methods to export for Atom
   def activate(): Unit = js.native
-  def deactivate(): Unit = js.native
+  def deactivate(): js.Promise[js.Any] = js.native
+
+  // Providers
+  def provideOutlines(): js.Any = js.native
+  def provideDefinitions(): js.Any = js.native
+  def provideCodeFormat(): js.Any = js.native
+  def provideAutocomplete(): js.Any = js.native
+
+  // Consumers
+  def consumeDatatip(service: js.Any): Unit = js.native
+  def consumeLinterV2(registerIndie: js.Any): Unit = js.native
 
   // Methods obligatory to override
   def getGrammarScopes(): js.Array[String] = js.native
@@ -16,6 +26,7 @@ class AutoLanguageClient extends js.Object {
   def getServerName(): String = js.native
   def startServerProcess(projectPath: String): ChildProcess = js.native
 
+  // Rest
   val processStdErr: String = js.native
   def captureServerErrors(childProcess: ChildProcess): Unit = js.native
   def handleSpawnFailure(err: js.Any): Unit = js.native
