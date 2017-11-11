@@ -19,7 +19,10 @@ scalacOptions ++= Seq(
 )
 
 enablePlugins(ScalaJSPlugin)
-scalaJSLinkerConfig ~= {
-  _.withModuleKind(ModuleKind.CommonJSModule) andThen
-  _.withOutputMode(OutputMode.ECMAScript2015)
+scalaJSLinkerConfig ~= { conf =>
+  conf
+    .withModuleKind(ModuleKind.CommonJSModule)
+    .withOutputMode(OutputMode.ECMAScript2015)
 }
+
+libraryDependencies += "io.scalajs" %%% "nodejs" % "0.4.2"
