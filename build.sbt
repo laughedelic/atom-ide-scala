@@ -1,3 +1,5 @@
+import org.scalajs.core.tools.linker.standard._
+
 name := "atom-ide-scala"
 organization := "laughedelic"
 
@@ -17,3 +19,7 @@ scalacOptions ++= Seq(
 )
 
 enablePlugins(ScalaJSPlugin)
+scalaJSLinkerConfig ~= {
+  _.withModuleKind(ModuleKind.CommonJSModule) andThen
+  _.withOutputMode(OutputMode.ECMAScript2015)
+}
