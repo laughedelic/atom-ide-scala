@@ -1,14 +1,11 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js, js.annotation._, js.Dynamic.global
-import facade.atom_languageclient._
-import facade.atom_ide.busy_signal._
+import scala.scalajs.js, js.annotation._
+import facade.atom_ide.busy_signal.BusySignalService
 
 // NOTE: This is pure boilerplate. We need it because we can't simply say `module.exports = new ScalaLanguageClient();`
 object Exports {
-
-  @JSExportTopLevel("client")
-  val client = new ScalaLanguageClient()
+  private val client = new ScalaLanguageClient()
 
   @JSExportTopLevel("activate")
   def activate(): Unit = client.activate()
