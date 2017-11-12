@@ -1,6 +1,6 @@
 {
   "name": "ide-scala",
-  "main": "./target/scala-2.12/atom-ide-scala-fastopt.js",
+  "main": "./target/scala-2.12/atom-ide-scala-opt.js",
   "version": "0.2.0",
   "description": "Scala language support for Atom IDE using Scalameta language server",
   "author": {
