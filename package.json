@@ -2,7 +2,7 @@
   "name": "ide-scala",
   "main": "./target/scala-2.12/atom-ide-scala-opt.js",
   "version": "0.2.0",
-  "description": "Scala language support for Atom IDE using Scalameta language server",
+  "description": "Scala language support for Atom-IDE",
   "author": {
     "name": "Alexey Alekhin",
     "email": "laughedelic@gmail.com",
