@@ -80,6 +80,7 @@ publish := {
   import sys.process._
   val log = streams.value.log
 
+  dynverAssertVersion.value
   if (!isVersionStable.value) sys.error("There are uncommited changes")
 
   val tagName = s"v${version.value}"
@@ -93,11 +94,11 @@ publish := {
   git("add", "--force", mainJs.getPath, packageJson.getPath)
   git("status", "-s")
   git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
-  git("log", "--format='%s (%h)'", "-1")
+  git("log", "--oneline", "-1")
 
   // Tag and push to Github
   git("tag", tagName)
-  git("push", "--porcelain", "--verbose", "origin", tagName)
+  git("push", "--porcelain", "origin", tagName)
 
   // Publish to Atom.io
   val exitCode = Seq("apm", "publish", "--tag", tagName).!(log)
@@ -107,16 +108,35 @@ publish := {
   } else {
     // Revert the tag
     git("checkout", "--quiet", "-")
-    git("push", "-d", "origin", tagName)
-    git("tag",  "-d",           tagName)
+    git("push", "-d", "--porcelain", "origin", tagName)
+    git("tag",  "-d", tagName)
 
     sys.error("apm publish failed")
   }
 }
 
-// TODO: version parser and bumping
-// val nextVersion = (Space ~> oneOf(Seq("major", "minor", "patch").map(literal))).parsed
-commands +=  Command.single("release") { (state0, newVersion) =>
+def nextVersion(current: String): complete.Parser[String] = {
+  import complete.DefaultParsers._
+
+  val semver = """v?([0-9]+)\.([0-9]+)\.([0-9]+)([-+].*)?""".r
+  val bumper = oneOf(Seq("major", "minor", "patch").map(literal))
+
+  Space ~> bumper.flatMap { bump =>
+    current match {
+      case semver(maj, min, bug, _) => bump match {
+        case "major" => success( s"${maj.toInt + 1}.${min}.${bug}" )
+        case "minor" => success( s"${maj}.${min.toInt + 1}.${bug}" )
+        case "patch" => success( s"${maj}.${min}.${bug.toInt + 1}" )
+      }
+      case _ => failure("Current version is not semantic")
+    }
+  }
+}
+
+commands += Command("release")(_ => nextVersion(version.value)) { (state0, newVersion) =>
+  import scala.io.AnsiColor._
+  state0.log.info(s"Releasing ${BOLD}v${newVersion}${RESET}...")
+
   val state1 = Project.extract(state0).append(Seq(version := newVersion), state0)
   val state2 = Project.extract(state1).runTask(publish in Compile, state1)._1
   state2
