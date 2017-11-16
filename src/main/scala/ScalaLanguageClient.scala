@@ -42,6 +42,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     val serverProcess = ChildProcess.spawn(javaBin, javaArgs)
     client.captureServerErrors(serverProcess)
     serverProcess.on("exit", { err: js.Any =>
+      busySignal.clear()
       client.handleSpawnFailure(client.processStdErr)
     })
     serverProcess
