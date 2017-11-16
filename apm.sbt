@@ -1,4 +1,4 @@
-lazy val apmPackage = inputKey[File]("Generates package.json for apm")
+lazy val apmPackage = taskKey[File]("Generates package.json for apm")
 
 apmPackage := {
   import play.api.libs.json._
@@ -72,10 +72,43 @@ apmPackage := {
     )
   )
 
-  // val original = Json.parse(IO.read(packageJson)).as[JsObject]
-  // val diff = original.fieldSet diff json.fieldSet
-  // log.error(diff.toString)
-
   IO.write(packageJson, Json.prettyPrint(json))
   packageJson
+}
+
+publish := {
+  import sys.process._
+  val log = streams.value.log
+
+  // TODO: version bumping
+  // val nextVersion = (Space ~> oneOf(Seq("major", "minor", "patch").map(literal))).parsed
+  val tagName = s"v${version.value}"
+
+  val mainJs = fullOptJS.in(Compile).value.data
+  val packageJson = apmPackage.value
+
+  def git(args: String*) = ("git" +: args).!(log)
+  def HEAD = Seq("git", "rev-parse", "HEAD").!!.trim
+
+  // Prepare commit on detached HEAD
+  git("checkout", "--quiet", "--detach", HEAD)
+  git("add", "--force", mainJs.getPath, packageJson.getPath)
+  git("status", "-s")
+  git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
+  git("log", "--format='%s (%h)'", "-1")
+  // Tag and push to Github
+  git("tag", tagName)
+  git("push", "--porcelain", "--verbose", "origin", tagName)
+
+  val exitCode = Seq("apm", "publish", "--tag", tagName).!(log)
+  if (exitCode == 0) {
+    Seq("apm", "view", "ide-scala").!(log)
+  } else {
+    // Revert the tag
+    git("checkout", "--quiet", "-")
+    git("push", "-d", "origin", tagName)
+    git("tag",  "-d",           tagName)
+
+    sys.error("apm publish failed")
+  }
 }
