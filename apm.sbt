@@ -112,3 +112,11 @@ publish := {
     sys.error("apm publish failed")
   }
 }
+
+// TODO: version parser and bumping
+// val nextVersion = (Space ~> oneOf(Seq("major", "minor", "patch").map(literal))).parsed
+commands +=  Command.single("release") { (state0, newVersion) =>
+  val state1 = Project.extract(state0).append(Seq(version := newVersion), state0)
+  val state2 = Project.extract(state1).runTask(publish in Compile, state1)._1
+  state2
+}
