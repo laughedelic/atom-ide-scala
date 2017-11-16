@@ -6,8 +6,7 @@ organization := "laughedelic"
 scalaVersion := "2.12.4"
 
 scalacOptions ++= Seq(
-  "-encoding",
-  "utf8",
+  "-encoding", "utf8",
   "-feature",
   "-language:postfixOps",
   "-language:implicitConversions",
@@ -26,3 +25,6 @@ scalaJSLinkerConfig ~= { conf =>
 }
 
 libraryDependencies += "io.scalajs" %%% "nodejs" % "0.4.2"
+
+artifactPath in (Compile, fullOptJS) := target.value / "main.js"
+artifactPath in (Compile, fastOptJS) := (artifactPath in (Compile, fullOptJS)).value
