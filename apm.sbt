@@ -80,29 +80,30 @@ publish := {
   import sys.process._
   val log = streams.value.log
 
-  // TODO: version bumping
-  // val nextVersion = (Space ~> oneOf(Seq("major", "minor", "patch").map(literal))).parsed
-  val tagName = s"v${version.value}"
+  if (!isVersionStable.value) sys.error("There are uncommited changes")
 
+  val tagName = s"v${version.value}"
   val mainJs = fullOptJS.in(Compile).value.data
   val packageJson = apmPackage.value
 
   def git(args: String*) = ("git" +: args).!(log)
-  def HEAD = Seq("git", "rev-parse", "HEAD").!!.trim
 
   // Prepare commit on detached HEAD
-  git("checkout", "--quiet", "--detach", HEAD)
+  git("checkout", "--quiet", "--detach", "HEAD")
   git("add", "--force", mainJs.getPath, packageJson.getPath)
   git("status", "-s")
   git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
   git("log", "--format='%s (%h)'", "-1")
+
   // Tag and push to Github
   git("tag", tagName)
   git("push", "--porcelain", "--verbose", "origin", tagName)
 
+  // Publish to Atom.io
   val exitCode = Seq("apm", "publish", "--tag", tagName).!(log)
   if (exitCode == 0) {
     Seq("apm", "view", "ide-scala").!(log)
+    git("checkout", "--quiet", "-")
   } else {
     // Revert the tag
     git("checkout", "--quiet", "-")
