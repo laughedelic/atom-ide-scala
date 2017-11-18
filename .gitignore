@@ -75,7 +75,6 @@ workingDir/
 .idea/
 .idea_modules/
 src/main/main.iml
-lib/
 *.pem
 
 .tags*
@@ -83,3 +82,7 @@ lib/
 .classpath*
 .atom*
 .imdone*
+
+# APM
+lib/
+package.json
