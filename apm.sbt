@@ -69,6 +69,23 @@ apmPackage := {
       "outline-view" -> Json.obj(
         "versions" -> Json.obj("0.1.0" -> "provideOutlines")
       )
+    ),
+    "configSchema" -> Json.obj(
+      "server" -> Json.obj(
+        "type" -> "string",
+        "title" -> "Language server",
+        "default" -> "scalameta",
+        "enum" -> Json.arr(
+          Json.obj(
+            "value" -> "scalameta",
+            "description" -> "Scalameta"
+          ),
+          Json.obj(
+            "value" -> "ensime",
+            "description" -> "ENSIME"
+          )
+        )
+      )
     )
   )
 
