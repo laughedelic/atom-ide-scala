@@ -20,21 +20,18 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     val javaHome = ChildProcess.asInstanceOf[js.Dynamic].execSync("/usr/libexec/java_home").toString.trim
     val toolsJar = Path.join(javaHome, "lib", "tools.jar")
 
-    // TODO: try to use coursier directly
+    // TODO: try to use coursier directly or download it on the first run
     val coursierJar = Path.join(OS.homedir, "bin", "coursier")
-    val coursierArgs = Seq(
-      "launch", "--quiet",
-      "--extra-jars", toolsJar
-    ) ++ server.coursierArgs
 
     val javaBin = Path.join(javaHome, "bin", "java")
-    val javaArgs = Seq(
-      "-Xmx4G", // heap size
-      s"-Dvscode.workspace=${projectPath}",
-      // TODO: add log level to the plugin settings
-      s"-Dvscode.logLevel=DEBUG",
-      "-jar", coursierJar
-    ) ++ coursierArgs
+    val javaArgs =
+      server.javaArgs(projectPath) ++
+      Seq(
+        "-jar", coursierJar,
+        "launch", "--quiet",
+        "--extra-jars", toolsJar
+      ) ++
+      server.coursierArgs
 
     println((javaBin +: javaArgs).mkString("\n"))
 
