@@ -52,6 +52,9 @@ apmPackage := {
       "atom-ide-busy-signal" -> Json.obj(
         "versions" -> Json.obj("0.1.0" -> "consumeBusySignal")
       ),
+      "signature-help" -> Json.obj(
+        "versions" -> Json.obj("0.1.0" -> "consumeSignatureHelp")
+      ),
     ),
     "providedServices" -> Json.obj(
       "definitions" -> Json.obj(

@@ -29,5 +29,7 @@ object Exports {
   def consumeLinterV2(registerIndie: js.Any): Unit = client.consumeLinterV2(registerIndie)
   @JSExportTopLevel("consumeBusySignal")
   def consumeBusySignal(service: BusySignalService): Unit = client.consumeBusySignal(service)
+  @JSExportTopLevel("consumeSignatureHelp")
+  def consumeSignatureHelp(registry: js.Any): js.Any = client.consumeSignatureHelp(registry)
 
 }
