@@ -1,0 +1,5 @@
+Added support for
+* Formatting
+* Datatips (hover tooltips)
+* Outline view
+* Autocomplete

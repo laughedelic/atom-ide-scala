@@ -1,0 +1,1 @@
+First minimal release. It supports only go-to-definition feature.
