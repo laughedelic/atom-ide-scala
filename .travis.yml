@@ -1,0 +1,23 @@
+language: scala
+jdk: oraclejdk8
+scala: 2.12.4
+
+stages:
+  - name: test
+
+jobs:
+  include:
+    # default stage is test
+    - script: sbt apmPackage fullOptJS
+
+cache:
+  directories:
+    - $HOME/.sbt/0.13/dependency
+    - $HOME/.sbt/boot/scala*
+    - $HOME/.sbt/launchers
+    - $HOME/.ivy2/cache
+    - $HOME/.coursier
+
+before_cache:
+  - find $HOME/.sbt -name "*.lock" -type f -delete
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -type f -delete
