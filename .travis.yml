@@ -10,6 +10,9 @@ jobs:
     # default stage is test
     - script: sbt apmPackage fullOptJS
 
+branches:
+  only: master
+
 cache:
   directories:
     - $HOME/.sbt/0.13/dependency
