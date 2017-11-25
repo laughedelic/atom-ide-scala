@@ -40,7 +40,12 @@ scalaJSLinkerConfig ~= { conf =>
     .withOutputMode(OutputMode.ECMAScript2015)
 }
 
-libraryDependencies += "io.scalajs" %%% "nodejs" % "0.4.2"
+resolvers += Resolver.bintrayRepo("laughedelic", "maven")
+
+libraryDependencies ++= Seq(
+  "io.scalajs" %%% "nodejs" % "0.4.2",
+  "laughedelic" %%% "scalajs-atom-api" % "0.1.0"
+)
 
 artifactPath in (Compile, fullOptJS) := baseDirectory.value / "lib" / "main.js"
 artifactPath in (Compile, fastOptJS) := (artifactPath in (Compile, fullOptJS)).value
