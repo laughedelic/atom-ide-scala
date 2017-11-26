@@ -41,7 +41,8 @@ apmPackage := {
       "source.scala"
     ),
     "dependencies" -> Json.obj(
-      "atom-languageclient" -> "0.6.7"
+      "atom-languageclient" -> "0.6.7",
+      "find-java-home" -> "0.2.0"
     ),
     "consumedServices" -> Json.obj(
       "linter-indie" -> Json.obj(
