@@ -1,7 +1,7 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js
-import facade.atom_ide.busy_signal._
+import laughedelic.atom.ide.ui.busysignal._
 
 case class BusySignal(service: BusySignalService, name: String) {
   private var tooltip: Option[BusyMessage] = None

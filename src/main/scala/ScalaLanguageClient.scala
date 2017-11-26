@@ -4,8 +4,8 @@ import scala.scalajs.js, js.|, js.Dynamic.global, js.annotation._, js.JSConverte
 import io.scalajs.nodejs.child_process.ChildProcess
 import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
-import facade.atom_languageclient._
-import facade.atom_ide.busy_signal._
+import laughedelic.atom.languageclient._
+import laughedelic.atom.ide.ui.busysignal._
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
 

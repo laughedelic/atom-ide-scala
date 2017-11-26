@@ -1,7 +1,7 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.annotation._
-import facade.atom_ide.busy_signal.BusySignalService
+import laughedelic.atom.ide.ui.busysignal.BusySignalService
 
 // NOTE: This is pure boilerplate. We need it because we can't simply say `module.exports = new ScalaLanguageClient();`
 object Exports {
