@@ -20,8 +20,10 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     val javaHome = ChildProcess.asInstanceOf[js.Dynamic].execSync("/usr/libexec/java_home").toString.trim
     val toolsJar = Path.join(javaHome, "lib", "tools.jar")
 
-    // TODO: try to use coursier directly or download it on the first run
-    val coursierJar = Path.join(OS.homedir, "bin", "coursier")
+    val packagePath = global.atom.packages
+      .getLoadedPackage("ide-scala")
+      .path.asInstanceOf[String]
+    val coursierJar = Path.join(packagePath, "coursier")
 
     val javaBin = Path.join(javaHome, "bin", "java")
     val javaArgs =
