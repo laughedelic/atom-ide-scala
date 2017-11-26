@@ -8,7 +8,8 @@ apmPackage := {
 
   val author = developers.value.head
   val repository = scmInfo.value.get.browseUrl.toString
-  val mainJs = (artifactPath in (Compile, fullOptJS)).value
+  // val mainJs = (artifactPath in (Compile, fullOptJS)).value
+  val mainJs = fullOptJS.in(Compile).value.data
   val licenseName = licenses.value.head._1
 
   val json = Json.obj(
@@ -106,12 +107,21 @@ publish := {
   val tagName = s"v${version.value}"
   val mainJs = fullOptJS.in(Compile).value.data
   val packageJson = apmPackage.value
+  val coursierJar = {
+    import sys.process._
+    val file = baseDirectory.value / "coursier"
+    if (!file.exists) {
+      log.info("Downloading coursier...")
+      new java.net.URL("https://git.io/vgvpD") #> file !!
+    }
+    file
+  }
 
   def git(args: String*) = ("git" +: args).!(log)
 
   // Prepare commit on detached HEAD
   git("checkout", "--quiet", "--detach", "HEAD")
-  git("add", "--force", mainJs.getPath, packageJson.getPath)
+  git("add", "--force", mainJs.getPath, packageJson.getPath, coursierJar.getPath)
   git("status", "-s")
   git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
   git("log", "--oneline", "-1")
