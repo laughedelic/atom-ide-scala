@@ -1,6 +1,6 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js, js.annotation._, js.Dynamic.global
+import scala.scalajs.js, js.|, js.Dynamic.global, js.annotation._, js.JSConverters._
 import io.scalajs.nodejs.child_process.ChildProcess
 import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
@@ -15,9 +15,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def getLanguageName(): String = "Scala"
   override def getServerName(): String = server.name
 
-  override def startServerProcess(projectPath: String): ChildProcess = {
-    // FIXME: use more civilized way of detecting JAVA_HOME
-    val javaHome = ChildProcess.asInstanceOf[js.Dynamic].execSync("/usr/libexec/java_home").toString.trim
+  private def launchServer(javaHome: String, projectPath: String): ChildProcess = {
     val toolsJar = Path.join(javaHome, "lib", "tools.jar")
 
     val packagePath = global.atom.packages
@@ -44,6 +42,13 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       client.handleSpawnFailure(client.processStdErr)
     })
     serverProcess
+  }
+
+  override def startServerProcess(projectPath: String): ChildProcess | js.Promise[ChildProcess] = {
+    import scala.concurrent.ExecutionContext.Implicits.global
+    findJavaHome(allowJre = true).map { javaHome =>
+      launchServer(javaHome, projectPath)
+    }.toJSPromise
   }
 
   override def filterChangeWatchedFiles(filePath: String): Boolean = {
