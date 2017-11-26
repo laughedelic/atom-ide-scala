@@ -40,11 +40,11 @@ scalaJSLinkerConfig ~= { conf =>
     .withOutputMode(OutputMode.ECMAScript2015)
 }
 
-resolvers += Resolver.bintrayRepo("laughedelic", "maven")
+resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= Seq(
   "io.scalajs" %%% "nodejs" % "0.4.2",
-  "laughedelic" %%% "scalajs-atom-api" % "0.1.0"
+  "laughedelic" %%% "scalajs-atom-api" % "0.2.0"
 )
 
 // Following atom packages convention: lib/main.js is the plugin's entry point
