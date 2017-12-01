@@ -26,7 +26,14 @@ You will need [sbt](http://www.scala-sbt.org/download.html) (which you should ha
 1. First, you need to [setup the server](https://github.com/scalameta/language-server/blob/master/CONTRIBUTING.md). ⚠️ **Without server nothing will work** ⚠️
     It's not published anywhere yet, so you will have to clone server project and publish it locally. Follow linked instructions in the server repository and skip things related to VS Code.
 
-2. Next, you should install this plugin locally (and first uninstall it if you already had it):
+2. Ensure `JAVA_HOME` points to your local java installation
+
+3. Install `atom-ide-ui` if you don't have it already:
+    ```
+     apm install atom-ide-ui
+    ```
+
+4. Next, you should install this plugin locally (and first uninstall it if you already had it):
 
     ```
     apm uninstall ide-scala
@@ -90,3 +97,12 @@ atom.config.set('core.debugLSP', true)
 (You need to do it just once)
 
 Now you will see all communication between the client and language server.
+
+### FAQ
+
+* How to use with jEnv
+
+Export JAVA_HOME executing this command
+```
+jenv enable-plugin export
+```
