@@ -39,7 +39,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     client.captureServerErrors(serverProcess)
     serverProcess.on("exit", { err: js.Any =>
       busySignal.clear()
-      client.handleSpawnFailure(client.processStdErr)
+      if (err != 0.asInstanceOf[js.Any]) client.handleSpawnFailure(client.processStdErr)
     })
     serverProcess
   }
