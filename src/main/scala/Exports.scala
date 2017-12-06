@@ -19,6 +19,8 @@ object Exports {
   def provideDefinitions(): js.Any = client.provideDefinitions()
   @JSExportTopLevel("provideCodeHighlight")
   def provideCodeHighlight(): js.Any = client.provideCodeHighlight()
+  @JSExportTopLevel("provideFindReferences")
+  def provideFindReferences(): js.Any = client.provideFindReferences()
   @JSExportTopLevel("provideCodeFormat")
   def provideCodeFormat(): js.Any = client.provideCodeFormat()
   @JSExportTopLevel("provideAutocomplete")

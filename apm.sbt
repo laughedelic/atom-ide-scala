@@ -68,6 +68,9 @@ apmPackage := {
       "hyperclick" -> Json.obj(
         "versions" -> Json.obj("0.1.0" -> "provideHyperclick")
       ),
+      "find-references" -> Json.obj(
+        "versions" -> Json.obj("0.1.0" -> "provideFindReferences")
+      ),
       "autocomplete.provider" -> Json.obj(
         "versions" -> Json.obj("2.0.0" -> "provideAutocomplete")
       ),
