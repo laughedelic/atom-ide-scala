@@ -15,6 +15,16 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def getLanguageName(): String = "Scala"
   override def getServerName(): String = server.name
 
+  override def filterChangeWatchedFiles(filePath: String): Boolean =
+    server.watchFilter(filePath)
+
+  override def startServerProcess(projectPath: String): ChildProcess | js.Promise[ChildProcess] = {
+    import scala.concurrent.ExecutionContext.Implicits.global
+    findJavaHome(allowJre = true).map { javaHome =>
+      launchServer(javaHome, projectPath)
+    }.toJSPromise
+  }
+
   private def launchServer(javaHome: String, projectPath: String): ChildProcess = {
     val toolsJar = Path.join(javaHome, "lib", "tools.jar")
 
@@ -37,40 +47,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
 
     val serverProcess = ChildProcess.spawn(javaBin, js.Array(javaArgs: _*))
     client.captureServerErrors(serverProcess)
-    serverProcess.on("exit", { err: js.Any =>
-      busySignal.clear()
-      if (err != 0.asInstanceOf[js.Any]) client.handleSpawnFailure(client.processStdErr)
-    })
     serverProcess
-  }
-
-  override def startServerProcess(projectPath: String): ChildProcess | js.Promise[ChildProcess] = {
-    import scala.concurrent.ExecutionContext.Implicits.global
-    findJavaHome(allowJre = true).map { javaHome =>
-      launchServer(javaHome, projectPath)
-    }.toJSPromise
-  }
-
-  override def filterChangeWatchedFiles(filePath: String): Boolean = {
-    server.watchFilter(filePath)
-  }
-
-  override def preInitialization(connection: js.Any): Unit = {
-    busySignal.update(
-      text = "initializing language server...",
-      init = true,
-      reveal = false
-    )
-  }
-
-  override def postInitialization(server: js.Any): Unit = {
-    busySignal.clear()
-  }
-
-  // Is there any better way to consume this service?
-  private var busySignal: BusySignal = null
-  def consumeBusySignal(service: BusySignalService): Unit = {
-    client.busySignal = BusySignal(service, client.getServerName)
   }
 
 }
