@@ -62,6 +62,9 @@ apmPackage := {
       "definitions" -> Json.obj(
         "versions" -> Json.obj("0.1.0" -> "provideDefinitions")
       ),
+      "code-highlight" -> Json.obj(
+        "versions" -> Json.obj("0.1.0" -> "provideCodeHighlight")
+      ),
       "hyperclick" -> Json.obj(
         "versions" -> Json.obj("0.1.0" -> "provideHyperclick")
       ),
