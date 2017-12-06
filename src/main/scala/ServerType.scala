@@ -18,12 +18,14 @@ case object ServerType {
     val name: String = "Scalameta"
 
     def javaArgs(projectPath: String): Seq[String] = Seq(
+      "-XX:+UseG1GC",
+      "-XX:+UseStringDeduplication",
       s"-Dvscode.workspace=${projectPath}"
     )
 
     val coursierArgs: Seq[String] = Seq(
       "--repository", "bintray:dhpcs/maven",
-      "--repository", "sonatype:releases",
+      "--repository", "bintray:scalameta/maven",
       "org.scalameta:metaserver_2.12:0.1-SNAPSHOT",
       "--main", "scala.meta.languageserver.Main"
     )
