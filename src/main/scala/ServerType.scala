@@ -7,7 +7,7 @@ sealed trait ServerType {
   val name: String
 
   def javaArgs(projectPath: String): Seq[String]
-  val coursierArgs: Seq[String]
+  def coursierArgs(version: String): Seq[String]
 
   def watchFilter(filePath: String): Boolean
 }
@@ -23,10 +23,10 @@ case object ServerType {
       s"-Dvscode.workspace=${projectPath}"
     )
 
-    val coursierArgs: Seq[String] = Seq(
+    def coursierArgs(version: String = "0.1-SNAPSHOT"): Seq[String] = Seq(
       "--repository", "bintray:dhpcs/maven",
       "--repository", "bintray:scalameta/maven",
-      "org.scalameta:metaserver_2.12:0.1-SNAPSHOT",
+      s"org.scalameta:metaserver_2.12:${version}",
       "--main", "scala.meta.languageserver.Main"
     )
 
@@ -48,10 +48,10 @@ case object ServerType {
       s"-Dlsp.logLevel=DEBUG",
     )
 
-    val coursierArgs: Seq[String] = Seq(
+    def coursierArgs(version: String = "3.0.0-SNAPSHOT"): Seq[String] = Seq(
       "--repository", "bintray:dhpcs/maven",
       "--repository", "sonatype:snapshots",
-      "org.ensime:server_2.12:3.0.0-SNAPSHOT",
+      s"org.ensime:server_2.12:${version}",
       "--main", "org.ensime.server.Server",
       "--", "--lsp"
     )

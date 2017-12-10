@@ -60,6 +60,8 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       .path.asInstanceOf[String]
     val coursierJar = Path.join(packagePath, "coursier")
 
+    val serverVersion = global.atom.config.get("ide-scala.serverVersion").asInstanceOf[String]
+
     val javaBin = Path.join(javaHome, "bin", "java")
     val javaArgs =
       server.javaArgs(projectPath) ++
@@ -69,7 +71,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         "launch", "--quiet",
         "--extra-jars", toolsJar
       ) ++
-      server.coursierArgs
+      server.coursierArgs(serverVersion)
 
     println((javaBin +: javaArgs).mkString("\n"))
 

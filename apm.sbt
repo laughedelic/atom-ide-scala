@@ -99,6 +99,12 @@ apmPackage := {
           )
         )
       ),
+      "serverVersion" -> Json.obj(
+        "order" -> 2,
+        "type" -> "string",
+        "title" -> "Language Server Version",
+        "default" -> "0.1-SNAPSHOT"
+      ),
       "jvm" -> Json.obj(
         "order" -> 3,
         "type" -> "object",
