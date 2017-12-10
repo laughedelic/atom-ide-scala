@@ -43,10 +43,24 @@ See also default [Atom IDE keybindings](https://github.com/facebook-atom/atom-id
 
 For the full list of implemented and planned features see the [server roadmap](https://github.com/scalameta/language-server/blob/master/README.md#roadmap).
 
+## Installation
+
+* You need to have packages for basic Scala language support and the [IDE UI](https://github.com/facebook-atom/atom-ide-ui) installed. You can install all three at once with this command:
+    ```
+     apm install language-scala atom-ide-ui atom-ide-scala
+    ```
+
+* If you are using [jEnv](http://www.jenv.be) you may need to export `JAVA_HOME` using jEnv plugin:
+    ```
+    jenv enable-plugin export
+    ```
+
 
 ## Usage
 
-Note in the current state if you just install the plugin with the Atom package manager it won't do anything by itself. You need to setup the server. So check the [development setup](CONTRIBUTING.md#development) instructions.
+1. Follow Scalameta language server [beta testing instructions](https://github.com/scalameta/language-server/blob/master/BETA.md) to prepare your Scala projects.
+2. Open a project in Atom. Once you open a Scala file, server will get launched and you will see a spinning indicator in the status bar.
+3. Notice that when you close all tabs with Scala files, language server will be stopped. See [atom-languageclient#141](https://github.com/atom/atom-languageclient/issues/141) for discussion on this behavior.
 
 
 [Scala]: http://scala-lang.org/
