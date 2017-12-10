@@ -24,13 +24,18 @@ This plugin naturally doesn't do much, it just launches the server and wires com
 Here is a list of the features which are implemented. It doesn't mean that they work well, just that they are implemented on the server side and supported by this plugin.
 
 * [Formatting](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/code-format.md) with [Scalafmt](http://scalameta.org/scalafmt):
-  + Add [Scalafmt config](http://scalameta.org/scalafmt/#Configuration) to the project
+  + Add `.scalafmt` [config](http://scalameta.org/scalafmt/#Configuration) to the project
   + Use <kbd>cmd</kbd><kbd>shift</kbd><kbd>C</kbd> hotkey
   + It formats the whole file
+* [Diagnostics](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/diagnostics.md):
+  + If you have `.scalafix` configuration in the project, you will see linting messages in the diagnostics panel and red underlines in the code
 * [Definitions](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/definitions.md):
-  + It works only on the sources inside the project
-  + Hold <kbd>cmd</kbd> and hover to preview the definition
-  + Hold <kbd>cmd</kbd> and click to jump to the definition
+  + Hold <kbd>cmd</kbd> and hover to preview the definition or click to jump to the source
+* [References](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/find-references.md):
+  + Right-click on a symbol and choose `Find References` in the context menu
+  + Or open command palette and run `Find References` command
+* [Code Highlights](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/code-highlight.md):
+  + When cursor is placed on a symbol, all its occurrences in the file should get highlighted
 * [Datatips](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/datatips.md) (type on hover):
   + Just hover over a symbol to see its type
   + You can also hold <kbd>alt</kbd> to see the type of symbol under the cursor
