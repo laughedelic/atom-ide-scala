@@ -82,9 +82,11 @@ apmPackage := {
       )
     ),
     "configSchema" -> Json.obj(
-      "server" -> Json.obj(
+      "serverType" -> Json.obj(
+        "order" -> 1,
         "type" -> "string",
-        "title" -> "Language server",
+        "title" -> "Language Server Type",
+        "description" -> "Don't change this option unless you know what you're doing",
         "default" -> "scalameta",
         "enum" -> Json.arr(
           Json.obj(
@@ -93,7 +95,34 @@ apmPackage := {
           ),
           Json.obj(
             "value" -> "ensime",
-            "description" -> "ENSIME"
+            "description" -> "ENSIME (experimental)"
+          )
+        )
+      ),
+      "serverVersion" -> Json.obj(
+        "order" -> 2,
+        "type" -> "string",
+        "title" -> "Language Server Version",
+        "default" -> "0.1-SNAPSHOT"
+      ),
+      "jvm" -> Json.obj(
+        "order" -> 3,
+        "type" -> "object",
+        "title" -> "Java-related settings",
+        "properties" -> Json.obj(
+          "javaHome" -> Json.obj(
+            "type" -> "string",
+            "title" -> "Java Home",
+            "description" -> "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
+            "default" -> ""
+          ),
+          "javaOpts" -> Json.obj(
+            "type" -> "array",
+            "title" -> "Extra JVM options",
+            "default" -> Json.arr(),
+            "items" -> Json.obj(
+              "type" -> "string"
+            )
           )
         )
       )
