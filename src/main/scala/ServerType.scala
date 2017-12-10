@@ -63,7 +63,7 @@ case object ServerType {
   }
 
   def fromConfig: ServerType = {
-    global.atom.config.get("ide-scala.server").toString match {
+    global.atom.config.get("ide-scala.serverType").toString match {
       case "scalameta" => Scalameta
       case "ensime" => Ensime
     }
