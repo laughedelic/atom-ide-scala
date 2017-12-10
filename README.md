@@ -43,6 +43,8 @@ Here is a list of the features which are implemented. It doesn't mean that they 
   + Use <kbd>alt</kbd><kbd>O</kbd> to open it
 * Auto completions as you type with presentation compiler
   + This requires running `*:scalametaEnableCompletions` in sbt first
+* [Signature Help](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/signature-help.md) (experimental UI):
+  + When you type a method name and an open parenthesis you should see information about method parameters
 
 See also default [Atom IDE keybindings](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/keybindings.md).
 
