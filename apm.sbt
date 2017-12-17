@@ -1,27 +1,73 @@
-lazy val apmPackage = taskKey[File]("Generates package.json for apm")
+lazy val getCoursier = taskKey[File]("Downloads Coursier if needed")
+lazy val packageJson = taskKey[File]("Generates package.json for apm")
 
-def getCoursier = Def.task {
-  import sys.process._
-  val log = streams.value.log
-  val file = baseDirectory.value / "coursier"
-  if (!file.exists) {
-    log.info("Downloading coursier...")
-    val exitCode = (new java.net.URL("https://git.io/vgvpD") #> file).!(log)
-    if (exitCode != 0) sys.error("Couldn't download Coursier")
-  }
-  file
+// Following atom packages convention: lib/main.js is the plugin's entry point
+artifactPath in (Compile, fullOptJS) := baseDirectory.value / "lib" / "main.js"
+artifactPath in (Compile, fastOptJS) := (artifactPath in (Compile, fullOptJS)).value
+
+packageBin in Compile := fullOptJS.in(Compile).value.data
+
+// TODO: typed config definition in the code
+lazy val configSchema = Def.setting {
+  import play.api.libs.json._
+  Json.obj(
+      "serverType" -> Json.obj(
+        "order" -> 1,
+        "type" -> "string",
+        "title" -> "Language Server Type",
+        "description" -> "Don't change this option unless you know what you're doing",
+        "default" -> "scalameta",
+        "enum" -> Json.arr(
+          Json.obj(
+            "value" -> "scalameta",
+            "description" -> "Scalameta"
+          ),
+          Json.obj(
+            "value" -> "ensime",
+            "description" -> "ENSIME (experimental)"
+          )
+        )
+      ),
+      "serverVersion" -> Json.obj(
+        "order" -> 2,
+        "type" -> "string",
+        "title" -> "Language Server Version",
+        "default" -> "1ebc5392"
+      ),
+      "jvm" -> Json.obj(
+        "order" -> 3,
+        "type" -> "object",
+        "title" -> "Java-related settings",
+        "properties" -> Json.obj(
+          "javaHome" -> Json.obj(
+            "type" -> "string",
+            "title" -> "Java Home",
+            "description" -> "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
+            "default" -> ""
+          ),
+          "javaOpts" -> Json.obj(
+            "type" -> "array",
+            "title" -> "Extra JVM options",
+            "default" -> Json.arr(),
+            "items" -> Json.obj(
+              "type" -> "string"
+            )
+          )
+        )
+      )
+    )
 }
 
-apmPackage := {
+packageJson := {
   import play.api.libs.json._
-
   val log = streams.value.log
-  val coursierJar = getCoursier.value
-  val packageJson = baseDirectory.value / "package.json"
+  val file = baseDirectory.value / "package.json"
+  log.info(s"Writing ${file} ...")
 
   val author = developers.value.head
   val repository = scmInfo.value.get.browseUrl.toString
-  val mainJs = fullOptJS.in(Compile).value.data
+  // NOTE: this only refers to the fullOptJS product, but doesn't trigger it
+  val mainJs = (artifactPath in (Compile, fullOptJS)).value
   val licenseName = licenses.value.head._1
 
   val json = Json.obj(
@@ -93,57 +139,29 @@ apmPackage := {
         "versions" -> Json.obj("0.1.0" -> "provideOutlines")
       )
     ),
-    "configSchema" -> Json.obj(
-      "serverType" -> Json.obj(
-        "order" -> 1,
-        "type" -> "string",
-        "title" -> "Language Server Type",
-        "description" -> "Don't change this option unless you know what you're doing",
-        "default" -> "scalameta",
-        "enum" -> Json.arr(
-          Json.obj(
-            "value" -> "scalameta",
-            "description" -> "Scalameta"
-          ),
-          Json.obj(
-            "value" -> "ensime",
-            "description" -> "ENSIME (experimental)"
-          )
-        )
-      ),
-      "serverVersion" -> Json.obj(
-        "order" -> 2,
-        "type" -> "string",
-        "title" -> "Language Server Version",
-        "default" -> "1ebc5392"
-      ),
-      "jvm" -> Json.obj(
-        "order" -> 3,
-        "type" -> "object",
-        "title" -> "Java-related settings",
-        "properties" -> Json.obj(
-          "javaHome" -> Json.obj(
-            "type" -> "string",
-            "title" -> "Java Home",
-            "description" -> "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
-            "default" -> ""
-          ),
-          "javaOpts" -> Json.obj(
-            "type" -> "array",
-            "title" -> "Extra JVM options",
-            "default" -> Json.arr(),
-            "items" -> Json.obj(
-              "type" -> "string"
-            )
-          )
-        )
-      )
-    )
+    "configSchema" -> configSchema.value
   )
 
-  IO.write(packageJson, Json.prettyPrint(json))
-  packageJson
+  IO.write(file, Json.prettyPrint(json))
+  file
 }
+
+getCoursier := {
+  import sys.process._
+  val log = streams.value.log
+  val file = baseDirectory.value / "coursier"
+  if (!file.exists) {
+    log.info("Downloading coursier...")
+    val exitCode = (new java.net.URL("https://git.io/vgvpD") #> file).!(log)
+    if (exitCode != 0) sys.error("Couldn't download Coursier")
+  }
+  file
+}
+
+sbt.Keys.`package` in Compile :=
+  packageBin.in(Compile)
+    .dependsOn(getCoursier, packageJson)
+    .value
 
 publish := {
   import sys.process._
@@ -153,15 +171,15 @@ publish := {
   if (!isVersionStable.value) sys.error("There are uncommited changes")
 
   val tagName = s"v${version.value}"
-  val mainJs = fullOptJS.in(Compile).value.data
-  val packageJson = apmPackage.value
+  val mainJs = packageBin.in(Compile).value
+  val pkgJson = packageJson.value
   val coursierJar = getCoursier.value
 
   def git(args: String*) = ("git" +: args).!(log)
 
   // Prepare commit on detached HEAD
   git("checkout", "--quiet", "--detach", "HEAD")
-  git("add", "--force", mainJs.getPath, packageJson.getPath, coursierJar.getPath)
+  git("add", "--force", mainJs.getPath, pkgJson.getPath, coursierJar.getPath)
   git("status", "-s")
   git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
   git("log", "--oneline", "-1")

@@ -36,7 +36,7 @@ If you're going to experiment with the server as well follow server [setup instr
 1. After you setup the server and plugin repository, you need to compile the Scala.js to JavaScript which Atom will use to load the plugin. In the plugin repository:
 
     ```
-    sbt apmPackage
+    sbt package
     ```
 
     It will generate `package.json` and `lib/main.js`.
@@ -51,7 +51,7 @@ If you're going to experiment with the server as well follow server [setup instr
 
 #### Every time you change the _plugin_ sources
 
-1. Run `apmPackage` in sbt
+1. Run `package` in sbt
 2. Reload the Atom window: <kbd>ctrl</kbd><kbd>cmd</kbd><kbd>alt</kbd><kbd>L</kbd>
 
 #### Every time you change the _server_ sources

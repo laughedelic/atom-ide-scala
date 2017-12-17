@@ -46,7 +46,3 @@ libraryDependencies ++= Seq(
   "io.scalajs" %%% "nodejs" % "0.4.2",
   "laughedelic" %%% "scalajs-atom-api" % "0.3.0"
 )
-
-// Following atom packages convention: lib/main.js is the plugin's entry point
-artifactPath in (Compile, fullOptJS) := baseDirectory.value / "lib" / "main.js"
-artifactPath in (Compile, fastOptJS) := (artifactPath in (Compile, fullOptJS)).value
