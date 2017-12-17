@@ -1,11 +1,15 @@
 lazy val getCoursier = taskKey[File]("Downloads Coursier if needed")
-lazy val packageJson = taskKey[File]("Generates package.json for apm")
+lazy val packageJson = settingKey[File]("Generates package.json for apm")
 
 // Following atom packages convention: lib/main.js is the plugin's entry point
 artifactPath in (Compile, fullOptJS) := baseDirectory.value / "lib" / "main.js"
 artifactPath in (Compile, fastOptJS) := (artifactPath in (Compile, fullOptJS)).value
 
 packageBin in Compile := fullOptJS.in(Compile).value.data
+
+cleanFiles ++= Seq(
+  baseDirectory.value / "lib"
+)
 
 // TODO: typed config definition in the code
 lazy val configSchema = Def.setting {
@@ -58,20 +62,8 @@ lazy val configSchema = Def.setting {
     )
 }
 
-lazy val packageJsonFile = Def.setting {
-  baseDirectory.value / "package.json"
-}
-
-cleanFiles ++= Seq(
-  baseDirectory.value / "lib",
-  packageJsonFile.value
-)
-
 packageJson := {
   import play.api.libs.json._
-  val log = streams.value.log
-  val file = packageJsonFile.value
-  log.info(s"Writing ${file} ...")
 
   val author = developers.value.head
   val repository = scmInfo.value.get.browseUrl.toString
@@ -150,6 +142,8 @@ packageJson := {
     "configSchema" -> configSchema.value
   )
 
+  sLog.value.info(s"Writing package.json ...")
+  val file = baseDirectory.value / "package.json"
   IO.write(file, Json.prettyPrint(json))
   file
 }
@@ -166,9 +160,10 @@ getCoursier := {
   file
 }
 
+// Main task that packages this Atom plugin
 sbt.Keys.`package` in Compile :=
   packageBin.in(Compile)
-    .dependsOn(getCoursier, packageJson)
+    .dependsOn(getCoursier)
     .value
 
 publish := {
