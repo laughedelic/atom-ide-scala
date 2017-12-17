@@ -8,7 +8,7 @@ stages:
 jobs:
   include:
     # default stage is test
-    - script: sbt apmPackage fullOptJS
+    - script: sbt package
 
 branches:
   only: master
