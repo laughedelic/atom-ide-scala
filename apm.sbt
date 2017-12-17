@@ -1,14 +1,26 @@
 lazy val apmPackage = taskKey[File]("Generates package.json for apm")
 
+def getCoursier = Def.task {
+  import sys.process._
+  val log = streams.value.log
+  val file = baseDirectory.value / "coursier"
+  if (!file.exists) {
+    log.info("Downloading coursier...")
+    val exitCode = (new java.net.URL("https://git.io/vgvpD") #> file).!(log)
+    if (exitCode != 0) sys.error("Couldn't download Coursier")
+  }
+  file
+}
+
 apmPackage := {
   import play.api.libs.json._
 
   val log = streams.value.log
+  val coursierJar = getCoursier.value
   val packageJson = baseDirectory.value / "package.json"
 
   val author = developers.value.head
   val repository = scmInfo.value.get.browseUrl.toString
-  // val mainJs = (artifactPath in (Compile, fullOptJS)).value
   val mainJs = fullOptJS.in(Compile).value.data
   val licenseName = licenses.value.head._1
 
@@ -143,15 +155,7 @@ publish := {
   val tagName = s"v${version.value}"
   val mainJs = fullOptJS.in(Compile).value.data
   val packageJson = apmPackage.value
-  val coursierJar = {
-    import sys.process._
-    val file = baseDirectory.value / "coursier"
-    if (!file.exists) {
-      log.info("Downloading coursier...")
-      new java.net.URL("https://git.io/vgvpD") #> file !!
-    }
-    file
-  }
+  val coursierJar = getCoursier.value
 
   def git(args: String*) = ("git" +: args).!(log)
 
