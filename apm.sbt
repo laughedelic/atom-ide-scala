@@ -283,3 +283,8 @@ commands += Command("release")(_ => nextVersion(version.value)) { (state0, newVe
   val state2 = Project.extract(state1).runTask(publish in Compile, state1)._1
   state2
 }
+
+ghreleaseAssets := Seq(
+  (artifactPath in (Compile, fullOptJS)).value,
+  packageJson.value
+)
