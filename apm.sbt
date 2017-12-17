@@ -230,18 +230,22 @@ def nextVersion(current: String): complete.Parser[String] = {
   import complete.DefaultParsers._
 
   val semver = """v?([0-9]+)\.([0-9]+)\.([0-9]+)([-+].*)?""".r
-  val bumper = oneOf(Seq("major", "minor", "patch").map(literal))
-
-  Space ~> bumper.flatMap { bump =>
-    current match {
-      case semver(maj, min, bug, _) => bump match {
-        case "major" => success( s"${maj.toInt + 1}.${min}.${bug}" )
-        case "minor" => success( s"${maj}.${min.toInt + 1}.${bug}" )
-        case "patch" => success( s"${maj}.${min}.${bug.toInt + 1}" )
+  def bumper(bump: String) = {
+    val next = current match {
+      case semver(maj, min, pat, _) => bump match {
+        case "major" => s"${maj.toInt + 1}.0.0"
+        case "minor" => s"${maj}.${min.toInt + 1}.0"
+        case "patch" => s"${maj}.${min}.${pat.toInt + 1}"
       }
-      case _ => failure("Current version is not semantic")
+      case _ => sys.error("Current version is not semantic")
     }
+    tokenDisplay(
+      bump ^^^ next,
+      s"${bump} (${next})"
+    )
   }
+
+  Space ~> oneOf(Seq("major", "minor", "patch").map(bumper))
 }
 
 commands += Command("release")(_ => nextVersion(version.value)) { (state0, newVersion) =>
