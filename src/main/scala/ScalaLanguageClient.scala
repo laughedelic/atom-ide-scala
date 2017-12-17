@@ -2,7 +2,7 @@ package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.|, js.Dynamic.global, js.annotation._, js.JSConverters._
 import scala.concurrent.{ Future, ExecutionContext }
-import io.scalajs.nodejs.child_process.ChildProcess
+import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
 import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
 import io.scalajs.nodejs.fs.Fs
@@ -75,7 +75,11 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
 
     println((javaBin +: javaArgs).mkString("\n"))
 
-    val serverProcess = ChildProcess.spawn(javaBin, js.Array(javaArgs: _*))
+    val serverProcess = ChildProcess.spawn(
+      javaBin,
+      javaArgs.toJSArray,
+      new SpawnOptions(cwd = projectPath)
+    )
     client.captureServerErrors(serverProcess)
     serverProcess
   }

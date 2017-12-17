@@ -18,9 +18,8 @@ case object ServerType {
     val name: String = "Scalameta"
 
     def javaArgs(projectPath: String): Seq[String] = Seq(
-      "-XX:+UseG1GC",
-      "-XX:+UseStringDeduplication",
-      s"-Dvscode.workspace=${projectPath}"
+      // "-XX:+UseG1GC",
+      // "-XX:+UseStringDeduplication"
     )
 
     def coursierArgs(version: String = "0.1-SNAPSHOT"): Seq[String] = Seq(
