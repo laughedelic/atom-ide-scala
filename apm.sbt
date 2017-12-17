@@ -166,17 +166,6 @@ sbt.Keys.`package` in Compile :=
     .dependsOn(getCoursier)
     .value
 
-def prepareReleaseNotes(ver: String): Def.Initialize[Task[File]] = Def.task {
-  val changelog = baseDirectory.value / "CHANGELOG.md"
-  if (!changelog.exists || IO.read(changelog).isEmpty)
-    sys.error("CHANGELOG.md is not found or is empty")
-
-  val notes = baseDirectory.value / "notes" / s"${ver}.markdown"
-  IO.move(changelog, notes)
-  IO.touch(changelog)
-  notes
-}
-
 def tagAndPublish(ver: String): Def.Initialize[Task[Unit]] = Def.taskDyn {
   import sys.process._
   val log = streams.value.log
@@ -184,7 +173,14 @@ def tagAndPublish(ver: String): Def.Initialize[Task[Unit]] = Def.taskDyn {
 
   def git(args: String*) = ("git" +: args).!(log)
 
-  val releaseNotes = prepareReleaseNotes(ver).value
+  val changelog = baseDirectory.value / "CHANGELOG.md"
+  if (!changelog.exists || IO.read(changelog).isEmpty)
+    sys.error("CHANGELOG.md is not found or is empty")
+
+  val releaseNotes = baseDirectory.value / "notes" / s"${ver}.markdown"
+  IO.copy(Map(changelog -> releaseNotes))
+  git("add", "--force", releaseNotes.getPath)
+  git("commit", "--quiet", "-m", s"Added release notes ${tagName}")
 
   // Prepare commit on detached HEAD
   git("checkout", "--quiet", "--detach", "HEAD")
@@ -192,7 +188,7 @@ def tagAndPublish(ver: String): Def.Initialize[Task[Unit]] = Def.taskDyn {
     packageBin.in(Compile).value.getPath,
     packageJson.value.getPath,
     getCoursier.value.getPath,
-    releaseNotes.getPath
+    changelog.getPath
   )
   git("status", "-s")
   git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
@@ -208,6 +204,7 @@ def tagAndPublish(ver: String): Def.Initialize[Task[Unit]] = Def.taskDyn {
     ohnosequences.sbt.GithubRelease.defs.githubRelease(tagName).value
     Seq("apm", "view", "ide-scala").!(log)
     git("checkout", "--quiet", "-")
+    IO.write(changelog, "")
   } else Def.task {
     // Revert the tag
     git("checkout", "--quiet", "-")
