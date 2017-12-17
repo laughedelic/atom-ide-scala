@@ -206,6 +206,26 @@ publish := {
   }
 }
 
+// Our Git tags are not on the master branch, so we manually set GitDescribeOutput using the latest tag and counting the distance from it
+dynverGitDescribeOutput in ThisBuild := Some {
+  import sbtdynver._
+  import sys.process._
+
+  def git(args: String*): String = ("git" +: args).!!(sLog.value).trim
+
+  val latestTagHash = git("rev-list", "--tags", "--max-count=1")
+  val latestTagName = git("describe", "--tags", latestTagHash)
+  // number of commits reachable from HEAD, but not the latest tag:
+  val distance = git("rev-list", "HEAD", s"^${latestTagHash}", "--count")
+  val headSHA = git("rev-parse", "--short", "HEAD")
+
+  GitDescribeOutput(
+    GitRef(latestTagName),
+    GitCommitSuffix(distance.toInt, headSHA),
+    GitDirtySuffix("-SNAPSHOT")
+  )
+}
+
 def nextVersion(current: String): complete.Parser[String] = {
   import complete.DefaultParsers._
 
