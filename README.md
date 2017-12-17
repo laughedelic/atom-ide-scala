@@ -54,7 +54,7 @@ For the full list of implemented and planned features see the [server roadmap](h
 
 * You need to have packages for basic Scala language support and the [IDE UI](https://github.com/facebook-atom/atom-ide-ui) installed. You can install all three at once with this command:
     ```
-     apm install language-scala atom-ide-ui atom-ide-scala
+     apm install language-scala atom-ide-ui ide-scala
     ```
 
 * If you are using [jEnv](http://www.jenv.be) you may need to export `JAVA_HOME` using jEnv plugin:
