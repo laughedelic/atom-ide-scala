@@ -166,23 +166,32 @@ sbt.Keys.`package` in Compile :=
     .dependsOn(getCoursier)
     .value
 
-publish := {
+def prepareReleaseNotes(ver: String): Def.Initialize[Task[File]] = Def.task {
+  val changelog = baseDirectory.value / "CHANGELOG.md"
+  if (!changelog.exists || IO.read(changelog).isEmpty)
+    sys.error("CHANGELOG.md is not found or is empty")
+
+  val notes = baseDirectory.value / "notes" / s"${ver}.markdown"
+  IO.move(changelog, notes)
+  IO.touch(changelog)
+  notes
+}
+
+def tagAndPublish(ver: String): Def.Initialize[Task[Unit]] = Def.taskDyn {
   import sys.process._
   val log = streams.value.log
-
-  dynverAssertVersion.value
-  if (!isVersionStable.value) sys.error("There are uncommited changes")
-
-  val tagName = s"v${version.value}"
-  val mainJs = packageBin.in(Compile).value
-  val pkgJson = packageJson.value
-  val coursierJar = getCoursier.value
+  val tagName = s"v${ver}"
 
   def git(args: String*) = ("git" +: args).!(log)
 
   // Prepare commit on detached HEAD
   git("checkout", "--quiet", "--detach", "HEAD")
-  git("add", "--force", mainJs.getPath, pkgJson.getPath, coursierJar.getPath)
+  git("add", "--force",
+    packageBin.in(Compile).value.getPath,
+    packageJson.value.getPath,
+    getCoursier.value.getPath,
+    prepareReleaseNotes(ver).value.getPath
+  )
   git("status", "-s")
   git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
   git("log", "--oneline", "-1")
@@ -193,10 +202,11 @@ publish := {
 
   // Publish to Atom.io
   val exitCode = Seq("apm", "publish", "--tag", tagName).!(log)
-  if (exitCode == 0) {
+  if (exitCode == 0) Def.task {
+    ohnosequences.sbt.GithubRelease.defs.githubRelease(tagName).value
     Seq("apm", "view", "ide-scala").!(log)
     git("checkout", "--quiet", "-")
-  } else {
+  } else Def.task {
     // Revert the tag
     git("checkout", "--quiet", "-")
     git("push", "-d", "--porcelain", "origin", tagName)
@@ -205,6 +215,12 @@ publish := {
     sys.error("apm publish failed")
   }
 }
+
+publish := Def.taskDyn {
+  dynverAssertVersion.value
+  if (!isVersionStable.value) sys.error("There are uncommited changes")
+  tagAndPublish(version.value)
+}.value
 
 // Our Git tags are not on the master branch, so we manually set GitDescribeOutput using the latest tag and counting the distance from it
 dynverGitDescribeOutput in ThisBuild := Some {
