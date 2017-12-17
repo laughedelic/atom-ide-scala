@@ -58,15 +58,23 @@ lazy val configSchema = Def.setting {
     )
 }
 
+lazy val packageJsonFile = Def.setting {
+  baseDirectory.value / "package.json"
+}
+
+cleanFiles ++= Seq(
+  baseDirectory.value / "lib",
+  packageJsonFile.value
+)
+
 packageJson := {
   import play.api.libs.json._
   val log = streams.value.log
-  val file = baseDirectory.value / "package.json"
+  val file = packageJsonFile.value
   log.info(s"Writing ${file} ...")
 
   val author = developers.value.head
   val repository = scmInfo.value.get.browseUrl.toString
-  // NOTE: this only refers to the fullOptJS product, but doesn't trigger it
   val mainJs = (artifactPath in (Compile, fullOptJS)).value
   val licenseName = licenses.value.head._1
 
