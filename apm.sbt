@@ -103,7 +103,7 @@ apmPackage := {
         "order" -> 2,
         "type" -> "string",
         "title" -> "Language Server Version",
-        "default" -> "0.1-SNAPSHOT"
+        "default" -> "1ebc5392"
       ),
       "jvm" -> Json.obj(
         "order" -> 3,
