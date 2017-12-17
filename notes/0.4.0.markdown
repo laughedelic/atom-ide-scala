@@ -1,0 +1,27 @@
+This is a big release with a lot of improvements. Most importantly plugin became self-contained. It means that it's packaged and distributed with everything it needs and refers to a publicly available language server artifact.
+
+So now you don't need to build both the plugin and the server from sources and publish locally, you can simply install plugin from the Atom packages store and start using it. See [usage instructions](README.md#Usage) for details.
+
+### New LSP features
+
+Scalameta language server has made a huge progress and this plugin tries to support well all of its new features. Besides the new features almost all other features got some improvements.
+
+Currently, all features provided by the Atom IDE UI except of code actions are supported:
+
+* [Formatting](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/code-format.md) (with [Scalafmt](http://scalameta.org/scalafmt))
+* [Diagnostics](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/diagnostics.md) (from [Scalafix](https://scalacenter.github.io/scalafix) and presentation compiler)
+* [Definitions](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/definitions.md) (preview and jump to the source)
+* [References](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/find-references.md)
+* [Code Highlights](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/code-highlight.md)
+* [Datatips](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/datatips.md) (type on hover/hotkey)
+* [Outline view](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/outline-view.md) (symbols tree)
+* Auto completions as you type with presentation compiler
+* [Signature Help](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/signature-help.md) (experimental UI)
+
+### Other important changes
+
+* #3: Made first steps for supporting ENSIME-3.0 LSP server (not ready for usage yet)
+* #5: Made use of the find-java-home library for better JAVA_HOME detection
+* #6: Added plugin configuration options
+* #22: Added a workaround for multiple repeating notifications from server
+* #15: Split Atom-related Scala.js facades into a separate project: [scalajs-atom-api](https://github.com/laughedelic/scalajs-atom-api)
