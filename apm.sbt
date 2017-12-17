@@ -184,20 +184,22 @@ def tagAndPublish(ver: String): Def.Initialize[Task[Unit]] = Def.taskDyn {
 
   def git(args: String*) = ("git" +: args).!(log)
 
+  val releaseNotes = prepareReleaseNotes(ver).value
+
   // Prepare commit on detached HEAD
   git("checkout", "--quiet", "--detach", "HEAD")
   git("add", "--force",
     packageBin.in(Compile).value.getPath,
     packageJson.value.getPath,
     getCoursier.value.getPath,
-    prepareReleaseNotes(ver).value.getPath
+    releaseNotes.getPath
   )
   git("status", "-s")
   git("commit", "--quiet", "-m", s"Prepared ${tagName} release")
   git("log", "--oneline", "-1")
 
   // Tag and push to Github
-  git("tag", tagName)
+  git("tag", "--annotate", s"--file=${releaseNotes.getPath}", tagName)
   git("push", "--porcelain", "origin", tagName)
 
   // Publish to Atom.io
@@ -218,7 +220,6 @@ def tagAndPublish(ver: String): Def.Initialize[Task[Unit]] = Def.taskDyn {
 
 publish := Def.taskDyn {
   dynverAssertVersion.value
-  if (!isVersionStable.value) sys.error("There are uncommited changes")
   tagAndPublish(version.value)
 }.value
 
