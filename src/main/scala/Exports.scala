@@ -3,12 +3,23 @@ package laughedelic.atom.ide.scala
 import scala.scalajs.js, js.annotation._
 import laughedelic.atom.ide.ui.busysignal.BusySignalService
 
-// NOTE: This is pure boilerplate. We need it because we can't simply say `module.exports = new ScalaLanguageClient();`
+@js.native @JSImport("atom-package-deps", JSImport.Namespace)
+object packageDeps extends js.Object {
+  def install(
+    packageName: String = js.native,
+    showPrompt: Boolean = js.native
+  ): js.Promise[Unit] = js.native
+}
+
+// NOTE: This is pure boilerplate. We need it because we can"t simply say `module.exports = new ScalaLanguageClient();`
 object Exports {
   private val client = new ScalaLanguageClient()
 
   @JSExportTopLevel("activate")
-  def activate(): Unit = client.activate()
+  def activate(): Unit = {
+    packageDeps.install("ide-scala", showPrompt = false)
+    client.activate()
+  }
   @JSExportTopLevel("deactivate")
   def deactivate(): js.Promise[js.Any] = client.deactivate()
 
