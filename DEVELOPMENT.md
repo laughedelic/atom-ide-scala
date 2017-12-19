@@ -86,4 +86,4 @@ Now you will see all LSP communication in this console.
 
 ### Server logs
 
-You can see more detailed logs from the server in `target/metaserver.log`.
+You can see more detailed logs from the server in `.metaserver/metaserver.log`.
