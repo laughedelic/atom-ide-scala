@@ -73,7 +73,7 @@ packageJson := {
   val json = Json.obj(
     "name" -> name.value.stripPrefix("atom-"),
     "main" -> s"./${mainJs.relativeTo(baseDirectory.value).get}",
-    "version" -> "0.4.0", //version.value,
+    "version" -> version.value,
     "description" -> description.value,
     "author" -> Json.obj(
       "name"  -> author.name,
