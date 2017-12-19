@@ -36,7 +36,7 @@ lazy val configSchema = Def.setting {
         "order" -> 2,
         "type" -> "string",
         "title" -> "Language Server Version",
-        "default" -> "1ebc5392"
+        "default" -> "5ddb92a9"
       ),
       "jvm" -> Json.obj(
         "order" -> 3,
