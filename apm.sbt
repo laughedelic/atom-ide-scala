@@ -100,7 +100,12 @@ packageJson := {
     ),
     "dependencies" -> Json.obj(
       "atom-languageclient" -> "0.7.0",
+      "atom-package-deps" -> "4.6.1",
       "find-java-home" -> "0.2.0"
+    ),
+    "package-deps" -> Json.arr(
+      "language-scala",
+      "atom-ide-ui"
     ),
     "consumedServices" -> Json.obj(
       "linter-indie" -> Json.obj(
