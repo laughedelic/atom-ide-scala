@@ -41,6 +41,8 @@ If you're going to experiment with the server as well follow server [setup instr
 
     It will generate `package.json` and `lib/main.js`.
 
+    First time you also need to run `apm install` to install node modules.
+
 2. Now you can go to any test Scala project and open Atom in development mode:
 
     ```

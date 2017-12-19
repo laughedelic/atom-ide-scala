@@ -99,7 +99,7 @@ packageJson := {
       "source.scala"
     ),
     "dependencies" -> Json.obj(
-      "atom-languageclient" -> "0.7.0",
+      "atom-languageclient" -> "0.7.3",
       "atom-package-deps" -> "4.6.1",
       "find-java-home" -> "0.2.0"
     ),
