@@ -128,6 +128,9 @@ packageJson := {
       "code-highlight" -> Json.obj(
         "versions" -> Json.obj("0.1.0" -> "provideCodeHighlight")
       ),
+      "code-actions" -> Json.obj(
+        "versions" -> Json.obj("0.1.0" -> "provideCodeActions")
+      ),
       "hyperclick" -> Json.obj(
         "versions" -> Json.obj("0.1.0" -> "provideHyperclick")
       ),

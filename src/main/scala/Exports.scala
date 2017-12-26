@@ -34,6 +34,8 @@ object Exports {
   def provideFindReferences(): js.Any = client.provideFindReferences()
   @JSExportTopLevel("provideCodeFormat")
   def provideCodeFormat(): js.Any = client.provideCodeFormat()
+  @JSExportTopLevel("provideCodeActions")
+  def provideCodeActions(): js.Any = client.provideCodeActions()
   @JSExportTopLevel("provideAutocomplete")
   def provideAutocomplete(): js.Any = client.provideAutocomplete()
 
