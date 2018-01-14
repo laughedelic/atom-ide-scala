@@ -1,160 +1,6 @@
+import play.api.libs.json._
+
 lazy val getCoursier = taskKey[File]("Downloads Coursier if needed")
-lazy val packageJson = settingKey[File]("Generates package.json for apm")
-
-// Following atom packages convention: lib/main.js is the plugin's entry point
-artifactPath in (Compile, fullOptJS) := baseDirectory.value / "lib" / "main.js"
-artifactPath in (Compile, fastOptJS) := (artifactPath in (Compile, fullOptJS)).value
-
-packageBin in Compile := fullOptJS.in(Compile).value.data
-
-cleanFiles ++= Seq(
-  baseDirectory.value / "lib"
-)
-
-// TODO: typed config definition in the code
-lazy val configSchema = Def.setting {
-  import play.api.libs.json._
-  Json.obj(
-      "serverType" -> Json.obj(
-        "order" -> 1,
-        "type" -> "string",
-        "title" -> "Language Server Type",
-        "description" -> "Don't change this option unless you know what you're doing",
-        "default" -> "scalameta",
-        "enum" -> Json.arr(
-          Json.obj(
-            "value" -> "scalameta",
-            "description" -> "Scalameta"
-          ),
-          Json.obj(
-            "value" -> "ensime",
-            "description" -> "ENSIME (experimental)"
-          )
-        )
-      ),
-      "serverVersion" -> Json.obj(
-        "order" -> 2,
-        "type" -> "string",
-        "title" -> "Language Server Version",
-        "default" -> "5ddb92a9"
-      ),
-      "jvm" -> Json.obj(
-        "order" -> 3,
-        "type" -> "object",
-        "title" -> "Java-related settings",
-        "properties" -> Json.obj(
-          "javaHome" -> Json.obj(
-            "type" -> "string",
-            "title" -> "Java Home",
-            "description" -> "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
-            "default" -> ""
-          ),
-          "javaOpts" -> Json.obj(
-            "type" -> "array",
-            "title" -> "Extra JVM options",
-            "default" -> Json.arr(),
-            "items" -> Json.obj(
-              "type" -> "string"
-            )
-          )
-        )
-      )
-    )
-}
-
-packageJson := {
-  import play.api.libs.json._
-
-  val author = developers.value.head
-  val repository = scmInfo.value.get.browseUrl.toString
-  val mainJs = (artifactPath in (Compile, fullOptJS)).value
-  val licenseName = licenses.value.head._1
-
-  val json = Json.obj(
-    "name" -> name.value.stripPrefix("atom-"),
-    "main" -> s"./${mainJs.relativeTo(baseDirectory.value).get}",
-    "version" -> version.value,
-    "description" -> description.value,
-    "author" -> Json.obj(
-      "name"  -> author.name,
-      "email" -> author.email,
-      "url"   -> author.url.toString
-    ),
-    "keywords" -> Json.arr(
-      "scala",
-      "scalameta",
-      "ide",
-      "atom-ide",
-      "lsp",
-      "language-server",
-      "language-server-protocol"
-    ),
-    "repository" -> repository,
-    "bugs"       -> s"${repository}/issues",
-    "license" -> licenseName,
-    "engines" -> Json.obj(
-      "atom" -> ">=1.21.0 <2.0.0"
-    ),
-    "enhancedScopes" -> Json.arr(
-      "source.scala"
-    ),
-    "dependencies" -> Json.obj(
-      "atom-languageclient" -> "0.7.3",
-      "atom-package-deps" -> "4.6.1",
-      "find-java-home" -> "0.2.0"
-    ),
-    "package-deps" -> Json.arr(
-      "language-scala",
-      "atom-ide-ui"
-    ),
-    "consumedServices" -> Json.obj(
-      "linter-indie" -> Json.obj(
-        "versions" -> Json.obj("2.0.0" -> "consumeLinterV2")
-      ),
-      "datatip" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "consumeDatatip")
-      ),
-      "atom-ide-busy-signal" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "consumeBusySignal")
-      ),
-      "signature-help" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "consumeSignatureHelp")
-      ),
-    ),
-    "providedServices" -> Json.obj(
-      "definitions" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "provideDefinitions")
-      ),
-      "code-highlight" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "provideCodeHighlight")
-      ),
-      "code-actions" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "provideCodeActions")
-      ),
-      "hyperclick" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "provideHyperclick")
-      ),
-      "find-references" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "provideFindReferences")
-      ),
-      "autocomplete.provider" -> Json.obj(
-        "versions" -> Json.obj("2.0.0" -> "provideAutocomplete")
-      ),
-      "code-format.range" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "provideCodeFormat")
-      ),
-      "outline-view" -> Json.obj(
-        "versions" -> Json.obj("0.1.0" -> "provideOutlines")
-      )
-    ),
-    "configSchema" -> configSchema.value
-  )
-
-  sLog.value.info(s"Writing package.json ...")
-  val file = baseDirectory.value / "package.json"
-  IO.write(file, Json.prettyPrint(json))
-  file
-}
 
 getCoursier := {
   import sys.process._
@@ -167,6 +13,105 @@ getCoursier := {
   }
   file
 }
+
+// TODO: typed config definition in the code
+apmConfigSchema := Json.obj(
+  "serverType" -> Json.obj(
+    "order" -> 1,
+    "type" -> "string",
+    "title" -> "Language Server Type",
+    "description" -> "Don't change this option unless you know what you're doing",
+    "default" -> "scalameta",
+    "enum" -> Json.arr(
+      Json.obj(
+        "value" -> "scalameta",
+        "description" -> "Scalameta"
+      ),
+      Json.obj(
+        "value" -> "ensime",
+        "description" -> "ENSIME (experimental)"
+      )
+    )
+  ),
+  "serverVersion" -> Json.obj(
+    "order" -> 2,
+    "type" -> "string",
+    "title" -> "Language Server Version",
+    "default" -> "5ddb92a9"
+  ),
+  "jvm" -> Json.obj(
+    "order" -> 3,
+    "type" -> "object",
+    "title" -> "Java-related settings",
+    "properties" -> Json.obj(
+      "javaHome" -> Json.obj(
+        "type" -> "string",
+        "title" -> "Java Home",
+        "description" -> "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
+        "default" -> ""
+      ),
+      "javaOpts" -> Json.obj(
+        "type" -> "array",
+        "title" -> "Extra JVM options",
+        "default" -> Json.arr(),
+        "items" -> Json.obj(
+          "type" -> "string"
+        )
+      )
+    )
+  )
+)
+
+apmKeywords := Seq(
+  "scala",
+  "scalameta",
+  "ide",
+  "atom-ide",
+  "lsp",
+  "language-server",
+  "language-server-protocol"
+)
+
+apmEngines := Map(
+  "atom" -> ">=1.21.0 <2.0.0"
+)
+
+apmDependencies := Map(
+  "atom-languageclient" -> "0.7.3",
+  "atom-package-deps" -> "4.6.1",
+  "find-java-home" -> "0.2.0"
+)
+
+apmConsumedServices := Map(
+  "linter-indie"          -> Map("2.0.0" -> "consumeLinterV2"),
+  "datatip"               -> Map("0.1.0" -> "consumeDatatip"),
+  "atom-ide-busy-signal"  -> Map("0.1.0" -> "consumeBusySignal"),
+  "signature-help"        -> Map("0.1.0" -> "consumeSignatureHelp")
+)
+
+apmProvidedServices := Map(
+  "definitions"           -> Map("0.1.0" -> "provideDefinitions"),
+  "code-highlight"        -> Map("0.1.0" -> "provideCodeHighlight"),
+  "code-actions"          -> Map("0.1.0" -> "provideCodeActions"),
+  "hyperclick"            -> Map("0.1.0" -> "provideHyperclick"),
+  "find-references"       -> Map("0.1.0" -> "provideFindReferences"),
+  "autocomplete.provider" -> Map("2.0.0" -> "provideAutocomplete"),
+  "code-format.range"     -> Map("0.1.0" -> "provideCodeFormat"),
+  "outline-view"          -> Map("0.1.0" -> "provideOutlines")
+)
+
+apmJson ~= { _ ++
+  Json.obj(
+    "enhancedScopes" -> Json.arr(
+      "source.scala"
+    ),
+    "package-deps" -> Json.arr(
+      "language-scala",
+      "atom-ide-ui"
+    )
+  )
+}
+
 
 // Main task that packages this Atom plugin
 sbt.Keys.`package` in Compile :=

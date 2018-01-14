@@ -34,12 +34,6 @@ scalacOptions ++= Seq(
 )
 
 enablePlugins(ScalaJSPlugin)
-scalaJSLinkerConfig ~= { conf =>
-  conf
-    .withModuleKind(ModuleKind.CommonJSModule)
-    .withOutputMode(OutputMode.ECMAScript2015)
-    .withSourceMap(false)
-}
 
 resolvers += Resolver.jcenterRepo
 
