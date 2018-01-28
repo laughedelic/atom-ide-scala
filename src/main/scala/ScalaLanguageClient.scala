@@ -28,7 +28,6 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       .fallbackTo(findJavaHome())
       .filter { javaHome =>
         // TODO: use accessSync
-        Fs.existsSync(Path.join(javaHome, "lib", "tools.jar")) &&
         Fs.existsSync(Path.join(javaHome, "bin", "java"))
       }
       .transform(
@@ -53,8 +52,6 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   }
 
   private def launchServer(javaHome: String, projectPath: String): ChildProcess = {
-    val toolsJar = Path.join(javaHome, "lib", "tools.jar")
-
     val packagePath = global.atom.packages
       .getLoadedPackage("ide-scala")
       .path.asInstanceOf[String]
@@ -68,10 +65,9 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       global.atom.config.get("ide-scala.jvm.javaOpts").asInstanceOf[js.Array[String]] ++
       Seq(
         "-jar", coursierJar,
-        "launch", "--quiet",
-        "--extra-jars", toolsJar
+        "launch", "--quiet"
       ) ++
-      server.coursierArgs(serverVersion)
+      server.coursierArgs(javaHome, serverVersion)
 
     println((javaBin +: javaArgs).mkString("\n"))
 
