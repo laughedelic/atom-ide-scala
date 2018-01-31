@@ -6,6 +6,7 @@ import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
 import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
 import io.scalajs.nodejs.fs.Fs
+import laughedelic.atom.{ Atom, NotificationOptions }
 import laughedelic.atom.languageclient._
 import laughedelic.atom.ide.ui.busysignal._
 
@@ -23,7 +24,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   /** Checks config setting first, if it's empty tries to find Java Home or report an error */
   private def getJavaHome(implicit ec: ExecutionContext): Future[String] = {
     Future {
-      global.atom.config.get("ide-scala.jvm.javaHome").asInstanceOf[String]
+      Atom.config.get("ide-scala.jvm.javaHome").asInstanceOf[String]
     }.filter(_.nonEmpty)
       .fallbackTo(findJavaHome())
       .filter { javaHome =>
@@ -32,9 +33,9 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       }
       .transform(
         identity[String], { th: Throwable =>
-          global.atom.notifications.addError(
+          Atom.notifications.addError(
             "Java Home is not found or is invalid. Try to set it explicitly in the plugin settings.",
-            js.Dynamic.literal(
+            new NotificationOptions(
               dismissable = true,
               detail = client.name
             )
@@ -57,12 +58,12 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       .path.asInstanceOf[String]
     val coursierJar = Path.join(packagePath, "coursier")
 
-    val serverVersion = global.atom.config.get("ide-scala.serverVersion").asInstanceOf[String]
+    val serverVersion = Atom.config.get("ide-scala.serverVersion").asInstanceOf[String]
 
     val javaBin = Path.join(javaHome, "bin", "java")
     val javaArgs =
       server.javaArgs(projectPath) ++
-      global.atom.config.get("ide-scala.jvm.javaOpts").asInstanceOf[js.Array[String]] ++
+      Atom.config.get("ide-scala.jvm.javaOpts").asInstanceOf[js.Array[String]] ++
       Seq(
         "-jar", coursierJar,
         "launch", "--quiet"
@@ -80,28 +81,19 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     serverProcess
   }
 
-  override def preInitialization(connection: js.Any): Unit = {
+  override def preInitialization(connection: LanguageClientConnection): Unit = {
     // NOTE: a workaround for repeating notifications (it should be fixed in atom-notifications)
     // On every new notification it goes through all matching old notifications and dismisses them.
     // We can do it only after the fact. Also we cannot dismiss the new one instead, because if some
     // old ones were dismissed manually, user won't see the new notifications.
-    global.atom.notifications.onDidAddNotification({ notification: AtomNotification =>
-      val notifications =
-        global.atom.notifications.getNotifications().asInstanceOf[js.Array[AtomNotification]]
-      val matching = notifications.filter { old =>
-        old != notification &&
-        old.getType() == notification.getType() &&
-        old.getMessage() == notification.getMessage()
+    Atom.notifications.onDidAddNotification { newOne =>
+      val notifications = Atom.notifications.getNotifications()
+      val matching = notifications.filter { oldOne =>
+        oldOne != newOne &&
+        oldOne.getType() == newOne.getType() &&
+        oldOne.getMessage() == newOne.getMessage()
       }
       matching.foreach { _.dismiss() }
-    })
+    }
   }
-}
-
-// An ad-hoc interface for the code Atom Notification type
-// TODO: move it somewhere else
-trait AtomNotification extends js.Object {
-  def getType(): String
-  def getMessage(): String
-  def dismiss(): Unit
 }

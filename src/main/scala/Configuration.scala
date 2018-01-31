@@ -2,6 +2,7 @@ package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.Dynamic.global
 import scala.scalajs.js.Dictionary
+import laughedelic.atom.{ Atom, ConfigChange }
 
 trait EnumEntry extends js.Object {
   val value: String
@@ -108,17 +109,8 @@ object PluginConfiguration {
   }
 
 
-  trait ConfigChange extends js.Object {
-    val newValue: js.Any
-    val oldValue: js.UndefOr[js.Any]
-  }
-
-  global.atom.config.onDidChange("ide-scala.serverType", onChangeServerType _)
-
-  private def onChangeServerType(change: ConfigChange): Unit = {
-    change.oldValue.foreach { _ =>
-      val newServerType = ServerTypes.find(_.value == change.newValue).get
-      global.atom.config.set("ide-scala.serverVersion", newServerType.defaultVersion)
-    }
-  }
+  Atom.config.onDidChange("ide-scala.serverType", { change: ConfigChange =>
+    val newServerType = ServerTypes.find(_.value == change.newValue).get
+    Atom.config.set("ide-scala.serverVersion", newServerType.defaultVersion)
+  })
 }
