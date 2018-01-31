@@ -2,6 +2,7 @@ package laughedelic.atom.ide.scala
 
 import io.scalajs.nodejs.path.Path
 import scala.scalajs.js, js.annotation._, js.Dynamic.global
+import laughedelic.atom.Atom
 
 sealed trait ServerType {
 
@@ -67,7 +68,7 @@ case object ServerType {
   }
 
   def fromConfig: ServerType = {
-    global.atom.config.get("ide-scala.serverType").toString match {
+    Atom.config.get("ide-scala.serverType").toString match {
       case "scalameta" => Scalameta
       case "ensime" => Ensime
     }
