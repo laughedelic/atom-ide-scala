@@ -23,7 +23,7 @@ case class BusySignal(service: BusySignalService, name: String) {
       tooltip = Some(
         service.reportBusy(
           formatMessage(text),
-          js.Dynamic.literal("revealTooltip" -> reveal)
+          new BusySignalOptions(revealTooltip = reveal)
         )
       )
     }

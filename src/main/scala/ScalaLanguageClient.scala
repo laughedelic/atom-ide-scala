@@ -80,7 +80,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     serverProcess
   }
 
-  override def preInitialization(connection: js.Any): Unit = {
+  override def preInitialization(connection: LanguageClientConnection): Unit = {
     // NOTE: a workaround for repeating notifications (it should be fixed in atom-notifications)
     // On every new notification it goes through all matching old notifications and dismisses them.
     // We can do it only after the fact. Also we cannot dismiss the new one instead, because if some
