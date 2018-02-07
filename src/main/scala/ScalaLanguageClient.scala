@@ -11,7 +11,8 @@ import laughedelic.atom.languageclient._
 import laughedelic.atom.ide.ui.busysignal._
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
-
+  import ScalaLanguageClient._
+  
   private lazy val server: ServerType = ServerType.fromConfig
 
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
@@ -96,4 +97,34 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       matching.foreach { _.dismiss() }
     }
   }
+
+  override def postInitialization(server: ActiveServer): Unit = {
+    val serverSupportedCommands = server.capabilities.executeCommandProvider.map(_.commands.toSet).getOrElse(Set.empty)
+
+    val commands = SupportedCommands.intersect(serverSupportedCommands)
+
+    commands.foreach { cmd =>
+      val cmdName = toAtomCommand(cmd)
+
+      Atom.commands.add("atom-text-editor", s"ide-scala:${cmdName}", { _ =>
+        server.connection.executeCommand(new ExecuteCommandParams(command = cmd))
+      }: js.Function1[Any, Unit])
+    }
+  }
+}
+
+object ScalaLanguageClient {
+
+  val ClearIndexCacheCommand = "clearIndexCache"
+  val ResetPresentationCompilerCommand = "resetPresentationCompiler"
+  val ScalafixUnusedImportsCommand = "scalafixUnusedImports"
+  val SbtConnectCommand = "sbtConnect"
+
+  val SupportedCommands = Set(
+    ClearIndexCacheCommand,
+    ResetPresentationCompilerCommand,
+    SbtConnectCommand)
+
+  // Transform from camelCase to camel-case
+  val toAtomCommand = "[A-Z]".r.replaceAllIn(_: String, { "-" + _.group(0).toLowerCase() })
 }
