@@ -16,8 +16,8 @@ object Exports {
   private val client = new ScalaLanguageClient()
 
   @JSExportTopLevel("config")
-  val config = PluginConfiguration.Default
- 
+  val config = Config.init("ide-scala")
+
   @JSExportTopLevel("activate")
   def activate(): Unit = {
     packageDeps.install("ide-scala", showPrompt = false)

@@ -45,5 +45,5 @@ resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= Seq(
   "io.scalajs" %%% "nodejs" % "0.4.2",
-  "laughedelic" %%% "scalajs-atom-api" % "0.4.0"
+  "laughedelic" %%% "scalajs-atom-api" % "0.4.0+15-fe2dec12"
 )
