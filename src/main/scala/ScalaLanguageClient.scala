@@ -23,9 +23,8 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
 
   /** Checks config setting first, if it's empty tries to find Java Home or report an error */
   private def getJavaHome(implicit ec: ExecutionContext): Future[String] = {
-    Future {
-      Atom.config.get("ide-scala.jvm.javaHome").asInstanceOf[String]
-    }.filter(_.nonEmpty)
+    Future(Config.jvm.javaHome.get)
+      .filter(_.nonEmpty)
       .fallbackTo(findJavaHome())
       .filter { javaHome =>
         // TODO: use accessSync
@@ -58,17 +57,15 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       .path.asInstanceOf[String]
     val coursierJar = Path.join(packagePath, "coursier")
 
-    val serverVersion = Atom.config.get("ide-scala.serverVersion").asInstanceOf[String]
-
     val javaBin = Path.join(javaHome, "bin", "java")
     val javaArgs =
       server.javaArgs(projectPath) ++
-      Atom.config.get("ide-scala.jvm.javaOpts").asInstanceOf[js.Array[String]] ++
+      Config.jvm.javaOpts.get ++
       Seq(
         "-jar", coursierJar,
         "launch", "--quiet"
       ) ++
-      server.coursierArgs(javaHome, serverVersion)
+      server.coursierArgs(javaHome, Config.serverVersion.get)
 
     println((javaBin +: javaArgs).mkString("\n"))
 
