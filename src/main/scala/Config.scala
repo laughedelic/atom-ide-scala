@@ -1,38 +1,25 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js, js.Dynamic.global
+import scala.scalajs.js, js.Dynamic.global, js.JSConverters._
 import scala.scalajs.js.Dictionary
 import laughedelic.atom.{ Atom, ConfigChange }
 import laughedelic.atom.config._
-
-object ServerTypes {
-  val Scalameta = new AllowedValue[String](
-    value = "scalameta",
-    description = "Scalameta"
-  )
-
-  val Ensime = new AllowedValue[String](
-    value = "ensime",
-    description = "ENSIME (experimental)"
-  )
-}
 
 object Config extends ConfigSchema {
 
   val serverType = new Setting[String](
     title = "Language Server Type",
     description = "Don't change this option unless you know what you're doing",
-    default = ServerTypes.Scalameta.value,
+    default = ServerType.Scalameta.name,
     order = 1,
-    enum = js.Array(
-      ServerTypes.Scalameta,
-      ServerTypes.Ensime
-    ),
+    enum = ServerType.values.map { st =>
+      new AllowedValue(st.name, st.description)
+    }.toJSArray,
   )
 
   val serverVersion = new Setting[String](
     title = "Language Server Version",
-    default = "5ddb92a9",
+    default = ServerType.Scalameta.defaultVersion,
     order = 2,
   )
 
@@ -56,4 +43,15 @@ object Config extends ConfigSchema {
     schema = jvmOpts
   )
 
+  override def init(prefix: String): ConfigSchema = {
+    val schema = super.init(prefix)
+    serverType.onDidChange({ change: ConfigChange =>
+      ServerType.values
+        .find { _.name == change.newValue }
+        .foreach { st =>
+          Config.serverVersion.set(st.defaultVersion)
+        }
+    })
+    schema
+  }
 }
