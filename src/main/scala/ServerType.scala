@@ -7,6 +7,8 @@ import laughedelic.atom.Atom
 sealed trait ServerType {
 
   val name: String
+  val description: String
+  val defaultVersion: String
 
   def javaArgs(projectPath: String): Seq[String]
   def coursierArgs(javaHome: String, version: String): Seq[String]
@@ -18,13 +20,15 @@ case object ServerType {
 
   case object Scalameta extends ServerType {
     val name: String = "Scalameta"
+    val description: String = "Scalameta"
+    val defaultVersion: String = "5ddb92a9"
 
     def javaArgs(projectPath: String): Seq[String] = Seq(
       // "-XX:+UseG1GC",
       // "-XX:+UseStringDeduplication"
     )
 
-    def coursierArgs(javaHome: String, version: String = "0.1-SNAPSHOT"): Seq[String] = Seq(
+    def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = Seq(
       "--repository", "bintray:dhpcs/maven",
       "--repository", "bintray:scalameta/maven",
       s"org.scalameta:metaserver_2.12:${version}",
@@ -38,7 +42,9 @@ case object ServerType {
   }
 
   case object Ensime extends ServerType {
-    val name: String = "ENSIME"
+    val name: String = "ensime"
+    val description: String = "ENSIME (experimental)"
+    val defaultVersion: String = "3.0.0-SNAPSHOT"
 
     def javaArgs(projectPath: String): Seq[String] = Seq(
       "-Xmx4G", // heap size
@@ -49,7 +55,7 @@ case object ServerType {
       s"-Dlsp.logLevel=DEBUG",
     )
 
-    def coursierArgs(javaHome: String, version: String = "3.0.0-SNAPSHOT"): Seq[String] = {
+    def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = {
       val toolsJar = Path.join(javaHome, "lib", "tools.jar")
       Seq(
         "--extra-jars", toolsJar,
@@ -68,9 +74,11 @@ case object ServerType {
   }
 
   def fromConfig: ServerType = {
-    Atom.config.get("ide-scala.serverType").toString match {
-      case "scalameta" => Scalameta
-      case "ensime" => Ensime
+    Config.serverType.get match {
+      case Scalameta.name => Scalameta
+      case Ensime.name => Ensime
     }
   }
+
+  val values = Seq(Scalameta, Ensime)
 }
