@@ -9,10 +9,11 @@ import io.scalajs.nodejs.fs.Fs
 import laughedelic.atom.{ Atom, NotificationOptions }
 import laughedelic.atom.languageclient._
 import laughedelic.atom.ide.ui.busysignal._
+import laughedelic.scalajs.findJavaHome
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
   import ScalaLanguageClient._
-  
+
   private lazy val server: ServerType = ServerType.fromConfig
 
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")

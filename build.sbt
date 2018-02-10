@@ -42,8 +42,10 @@ scalaJSLinkerConfig ~= { conf =>
 }
 
 resolvers += Resolver.jcenterRepo
+resolvers += Resolver.bintrayRepo("laughedelic", "maven")
 
 libraryDependencies ++= Seq(
   "io.scalajs" %%% "nodejs" % "0.4.2",
-  "laughedelic" %%% "scalajs-atom-api" % "0.4.0+15-fe2dec12"
+  "laughedelic" %%% "scalajs-atom-api" % "0.5.0",
+  "laughedelic" %%% "scalajs-java-home" % "0.1.0"
 )
