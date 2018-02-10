@@ -10,7 +10,7 @@ object Config extends ConfigSchema {
   val serverType = new Setting[String](
     title = "Language Server Type",
     description = "Don't change this option unless you know what you're doing",
-    default = ServerType.Scalameta.name,
+    default = ServerType.Metals.name,
     order = 1,
     enum = ServerType.values.map { st =>
       new AllowedValue(st.name, st.description)
@@ -19,7 +19,7 @@ object Config extends ConfigSchema {
 
   val serverVersion = new Setting[String](
     title = "Language Server Version",
-    default = ServerType.Scalameta.defaultVersion,
+    default = ServerType.Metals.defaultVersion,
     order = 2,
   )
 

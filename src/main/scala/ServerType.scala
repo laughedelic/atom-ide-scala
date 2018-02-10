@@ -18,15 +18,12 @@ sealed trait ServerType {
 
 case object ServerType {
 
-  case object Scalameta extends ServerType {
-    val name: String = "Scalameta"
-    val description: String = "Scalameta"
-    val defaultVersion: String = "5ddb92a9"
+  case object Metals extends ServerType {
+    val name: String = "metals"
+    val description: String = "Metals (Scalameta language server)"
+    val defaultVersion: String = "6f55b052"
 
-    def javaArgs(projectPath: String): Seq[String] = Seq(
-      // "-XX:+UseG1GC",
-      // "-XX:+UseStringDeduplication"
-    )
+    def javaArgs(projectPath: String): Seq[String] = Seq()
 
     def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = Seq(
       "--repository", "bintray:dhpcs/maven",
@@ -75,10 +72,10 @@ case object ServerType {
 
   def fromConfig: ServerType = {
     Config.serverType.get match {
-      case Scalameta.name => Scalameta
+      case Metals.name => Metals
       case Ensime.name => Ensime
     }
   }
 
-  val values = Seq(Scalameta, Ensime)
+  val values = Seq(Metals, Ensime)
 }
