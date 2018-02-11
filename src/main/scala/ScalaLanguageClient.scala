@@ -114,7 +114,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
 
   def mapConfigurationObject(configuration: js.Any): js.Any = {
     js.Dynamic.literal(
-      scalameta = configuration
+      metals = configuration
     )
   }
 

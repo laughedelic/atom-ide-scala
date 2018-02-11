@@ -21,7 +21,7 @@ case object ServerType {
   case object Metals extends ServerType {
     val name: String = "metals"
     val description: String = "Metals (Scalameta language server)"
-    val defaultVersion: String = "6f55b052"
+    val defaultVersion: String = "a212acd7"
 
     def javaArgs(projectPath: String): Seq[String] = Seq()
 
