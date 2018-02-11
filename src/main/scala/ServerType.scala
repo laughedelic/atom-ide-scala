@@ -70,12 +70,17 @@ case object ServerType {
     }
   }
 
-  def fromConfig: ServerType = {
-    Config.serverType.get match {
-      case Metals.name => Metals
-      case Ensime.name => Ensime
+  def fromName(name: String): Option[ServerType] =
+    name.toLowerCase match {
+      case "scalameta" => Some(Metals)
+      case Metals.name => Some(Metals)
+      case Ensime.name => Some(Ensime)
+      case _ => None
     }
-  }
+
+  // NOTE: config won't contain an ivalid value, so no Option here
+  def fromConfig: ServerType =
+    fromName(Config.serverType.get).get
 
   val values = Seq(Metals, Ensime)
 }

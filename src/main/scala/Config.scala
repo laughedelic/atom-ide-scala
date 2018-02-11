@@ -39,12 +39,19 @@ object Config extends ConfigSchema {
 
   override def init(prefix: String): ConfigSchema = {
     val schema = super.init(prefix)
+    // This toggles server version depending on the chosen server type
     serverType.onDidChange({ change: ConfigChange =>
-      ServerType.values
-        .find { _.name == change.newValue }
-        .foreach { st =>
-          Config.serverVersion.set(st.defaultVersion)
-        }
+      def getServerType(value: js.Any): Option[ServerType] =
+        if (js.typeOf(value) == "string")
+          ServerType.fromName(value.asInstanceOf[String])
+        else None
+      for {
+        oldST <- getServerType(change.oldValue)
+          // NOTE: if the version is changed, we don't want to overwrite it
+          if oldST.defaultVersion == Config.serverVersion.get
+        newST <- getServerType(change.newValue)
+      } yield
+        Config.serverVersion.set(newST.defaultVersion)
     })
     schema
   }
