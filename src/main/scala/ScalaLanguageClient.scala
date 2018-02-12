@@ -104,7 +104,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     commands.foreach { cmd =>
       val cmdName = toAtomCommand(cmd)
 
-      Atom.commands.add("atom-text-editor", s"ide-scala:${cmdName}", { _ =>
+      Atom.commands.add("atom-text-editor", s"metals:${cmdName}", { _ =>
         server.connection.executeCommand(new ExecuteCommandParams(command = cmd))
       }: js.Function1[Any, Unit])
     }
