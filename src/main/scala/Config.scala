@@ -101,6 +101,12 @@ object MetalsConfig extends ConfigSchema {
       title = "Enable formatting with scalafmt",
       order = 1,
     )
+    val onSave = new Setting[Boolean](
+      default = false,
+      title = "Format file before saving it",
+      description = "_EXPERIMENTAL_ (not supported in Atom yet)",
+      order = 2,
+    )
     val version = new Setting[String](
       default = "1.3.0",
       title =
