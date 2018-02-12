@@ -110,9 +110,9 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     }
   }
 
-  def getRootConfigurationKey(): String = "ide-scala.metals"
+  override def getRootConfigurationKey(): String = "ide-scala.metals"
 
-  def mapConfigurationObject(configuration: js.Any): js.Any = {
+  override def mapConfigurationObject(configuration: js.Any): js.Any = {
     js.Dynamic.literal(
       metals = configuration
     )
