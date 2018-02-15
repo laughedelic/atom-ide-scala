@@ -84,7 +84,7 @@ src/main/main.iml
 .classpath*
 .atom*
 .imdone*
-.metaserver/
+.metals/
 
 # APM
 lib/

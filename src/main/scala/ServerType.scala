@@ -21,15 +21,15 @@ case object ServerType {
   case object Metals extends ServerType {
     val name: String = "metals"
     val description: String = "Metals (Scalameta language server)"
-    val defaultVersion: String = "a212acd7"
+    val defaultVersion: String = "00483bd2"
 
     def javaArgs(projectPath: String): Seq[String] = Seq()
 
     def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = Seq(
       "--repository", "bintray:dhpcs/maven",
       "--repository", "bintray:scalameta/maven",
-      s"org.scalameta:metaserver_2.12:${version}",
-      "--main", "scala.meta.languageserver.Main"
+      s"org.scalameta:metals_2.12:${version}",
+      "--main", "scala.meta.metals.Main"
     )
 
     def watchFilter(filePath: String): Boolean = {
