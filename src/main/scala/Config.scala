@@ -117,7 +117,7 @@ object MetalsConfig extends ConfigSchema {
       order = 2,
     )
     val version = new Setting[String](
-      default = "1.3.0",
+      default = "1.4.0",
       title =
         "Version of Scalafmt to use"
     )
