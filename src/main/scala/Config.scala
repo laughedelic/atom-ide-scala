@@ -82,7 +82,7 @@ object MetalsConfig extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = false,
       title = "Use sbt server to run a command on file save and report diagnostics",
-      description = "⚠️ EXPERIMENTAL: requires sbt v1.1, which you have to launch manually",
+      description = "⚠️ EXPERIMENTAL: requires sbt v1.1 (launch sbt manually and use _Sbt Connect_ command)",
       order = 1,
     )
     val command = new Setting[String](
@@ -99,9 +99,8 @@ object MetalsConfig extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = false,
       title =
-        "Enable squigglies and completions as you type with the Scala Presentation Compiler",
-      description = "⚠️ EXPERIMENTAL: not stable",
-      order = 1,
+        "Enable diagnostics and completions as you type with the Scala Presentation Compiler",
+      description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
     )
   }
 
@@ -115,12 +114,14 @@ object MetalsConfig extends ConfigSchema {
       title = "Enable formatting with Scalafmt",
       order = 1,
     )
-    val onSave = new Setting[Boolean](
-      default = false,
-      title = "Format file before saving it",
-      description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
-      order = 2,
-    )
+    // TODO: uncomment when willSaveWaitUntil is supported in atom-languageclient
+    // TODO: check ide-ui "Format on save" option and warn if both are on
+    // val onSave = new Setting[Boolean](
+    //   default = false,
+    //   title = "Format file before saving it",
+    //   description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
+    //   order = 2,
+    // )
     val version = new Setting[String](
       default = "1.4.0",
       title =
@@ -159,11 +160,12 @@ object MetalsConfig extends ConfigSchema {
       default = true,
       title = "Enable indexing of the classpath"
     )
-    val indexJDK = new Setting[Boolean](
-      default = false,
-      title = "Enable indexing of the JDK",
-      description = "⚠️ EXPERIMENTAL",
-    )
+    // TODO: uncomment when https://github.com/scalameta/metals/issues/43 is fixed
+    // val indexJDK = new Setting[Boolean](
+    //   default = false,
+    //   title = "Enable indexing of the JDK",
+    //   description = "⚠️ EXPERIMENTAL",
+    // )
   }
 
   val hover = new SettingsGroup(
@@ -178,16 +180,17 @@ object MetalsConfig extends ConfigSchema {
     )
   }
 
-  val rename = new SettingsGroup(
-    title = "Renaming symbols",
-    schema = Rename
-  )
-  object Rename extends ConfigSchema {
-    val enabled = new Setting[Boolean](
-      default = true,
-      title = "Enable renaming symbols",
-      description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
-    )
-  }
+  // TODO: uncomment when it's supported in Atom IDE
+  // val rename = new SettingsGroup(
+  //   title = "Renaming symbols",
+  //   schema = Rename
+  // )
+  // object Rename extends ConfigSchema {
+  //   val enabled = new Setting[Boolean](
+  //     default = true,
+  //     title = "Enable renaming symbols",
+  //     description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
+  //   )
+  // }
 
 }
