@@ -18,21 +18,18 @@ sealed trait ServerType {
 
 case object ServerType {
 
-  case object Scalameta extends ServerType {
-    val name: String = "Scalameta"
-    val description: String = "Scalameta"
-    val defaultVersion: String = "5ddb92a9"
+  case object Metals extends ServerType {
+    val name: String = "metals"
+    val description: String = "Metals (Scalameta language server)"
+    val defaultVersion: String = "00483bd2"
 
-    def javaArgs(projectPath: String): Seq[String] = Seq(
-      // "-XX:+UseG1GC",
-      // "-XX:+UseStringDeduplication"
-    )
+    def javaArgs(projectPath: String): Seq[String] = Seq()
 
     def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = Seq(
       "--repository", "bintray:dhpcs/maven",
       "--repository", "bintray:scalameta/maven",
-      s"org.scalameta:metaserver_2.12:${version}",
-      "--main", "scala.meta.languageserver.Main"
+      s"org.scalameta:metals_2.12:${version}",
+      "--main", "scala.meta.metals.Main"
     )
 
     def watchFilter(filePath: String): Boolean = {
@@ -73,12 +70,17 @@ case object ServerType {
     }
   }
 
-  def fromConfig: ServerType = {
-    Config.serverType.get match {
-      case Scalameta.name => Scalameta
-      case Ensime.name => Ensime
+  def fromName(name: String): Option[ServerType] =
+    name.toLowerCase match {
+      case "scalameta" => Some(Metals)
+      case Metals.name => Some(Metals)
+      case Ensime.name => Some(Ensime)
+      case _ => None
     }
-  }
 
-  val values = Seq(Scalameta, Ensime)
+  // NOTE: config won't contain an ivalid value, so no Option here
+  def fromConfig: ServerType =
+    fromName(Config.serverType.get).get
+
+  val values = Seq(Metals, Ensime)
 }

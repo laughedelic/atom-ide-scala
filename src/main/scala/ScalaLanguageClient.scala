@@ -25,7 +25,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
 
   /** Checks config setting first, if it's empty tries to find Java Home or report an error */
   private def getJavaHome(implicit ec: ExecutionContext): Future[String] = {
-    Future(Config.jvm.javaHome.get)
+    Future(Config.java.home.get)
       .filter(_.nonEmpty)
       .fallbackTo(findJavaHome())
       .filter { javaHome =>
@@ -62,7 +62,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     val javaBin = Path.join(javaHome, "bin", "java")
     val javaArgs =
       server.javaArgs(projectPath) ++
-      Config.jvm.javaOpts.get ++
+      Config.java.extraArgs.get ++
       Seq(
         "-jar", coursierJar,
         "launch", "--quiet"
@@ -104,11 +104,20 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     commands.foreach { cmd =>
       val cmdName = toAtomCommand(cmd)
 
-      Atom.commands.add("atom-text-editor", s"ide-scala:${cmdName}", { _ =>
+      Atom.commands.add("atom-text-editor", s"metals:${cmdName}", { _ =>
         server.connection.executeCommand(new ExecuteCommandParams(command = cmd))
       }: js.Function1[Any, Unit])
     }
   }
+
+  override def getRootConfigurationKey(): String = "ide-scala.metals"
+
+  override def mapConfigurationObject(configuration: js.Any): js.Any = {
+    js.Dynamic.literal(
+      metals = configuration
+    )
+  }
+
 }
 
 object ScalaLanguageClient {
