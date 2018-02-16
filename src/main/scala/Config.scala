@@ -69,12 +69,15 @@ object JavaConfig extends ConfigSchema {
 
 object MetalsConfig extends ConfigSchema {
 
-  val sbt = new SettingsGroup(schema = Sbt)
+  val sbt = new SettingsGroup(
+    title = "sbt server integration",
+    schema = Sbt
+  )
   object Sbt extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = false,
       title = "Use sbt server to run a command on file save and report diagnostics",
-      description = "_EXPERIMENTAL_ (requires sbt 1.1)",
+      description = "⚠️ EXPERIMENTAL: requires sbt v1.1, which you have to launch manually",
       order = 1,
     )
     val command = new Setting[String](
@@ -83,34 +86,40 @@ object MetalsConfig extends ConfigSchema {
     )
   }
 
-  val scalac = new SettingsGroup(schema = Scalac)
+  val scalac = new SettingsGroup(
+    title = "Presentation compiler",
+    schema = Scalac
+  )
   object Scalac extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = false,
       title =
         "Enable squigglies and completions as you type with the Scala Presentation Compiler",
-      description = "_EXPERIMENTAL_",
+      description = "⚠️ EXPERIMENTAL: not stable",
       order = 1,
     )
   }
 
-  val scalafmt = new SettingsGroup(schema = Scalafmt)
+  val scalafmt = new SettingsGroup(
+    title = "Code formatting with Scalafmt",
+    schema = Scalafmt
+  )
   object Scalafmt extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
-      title = "Enable formatting with scalafmt",
+      title = "Enable formatting with Scalafmt",
       order = 1,
     )
     val onSave = new Setting[Boolean](
       default = false,
       title = "Format file before saving it",
-      description = "_EXPERIMENTAL_ (not supported in Atom yet)",
+      description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
       order = 2,
     )
     val version = new Setting[String](
       default = "1.3.0",
       title =
-        "Version of scalafmt to use"
+        "Version of Scalafmt to use"
     )
     val confPath = new Setting[String](
       default = ".scalafmt.conf",
@@ -119,7 +128,10 @@ object MetalsConfig extends ConfigSchema {
     )
   }
 
-  val scalafix = new SettingsGroup(schema = Scalafix)
+  val scalafix = new SettingsGroup(
+    title = "Code linting with Scalafix",
+    schema = Scalafix
+  )
   object Scalafix extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
@@ -133,7 +145,10 @@ object MetalsConfig extends ConfigSchema {
     )
   }
 
-  val search = new SettingsGroup(schema = Search)
+  val search = new SettingsGroup(
+    title = "Symbols search index",
+    schema = Search
+  )
   object Search extends ConfigSchema {
     val indexClasspath = new Setting[Boolean](
       default = true,
@@ -142,11 +157,14 @@ object MetalsConfig extends ConfigSchema {
     val indexJDK = new Setting[Boolean](
       default = false,
       title = "Enable indexing of the JDK",
-      description = "_EXPERIMENTAL_",
+      description = "⚠️ EXPERIMENTAL",
     )
   }
 
-  val hover = new SettingsGroup(schema = Hover)
+  val hover = new SettingsGroup(
+    title = "Tooltips on hover",
+    schema = Hover
+  )
   object Hover extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
@@ -155,12 +173,15 @@ object MetalsConfig extends ConfigSchema {
     )
   }
 
-  val rename = new SettingsGroup(schema = Rename)
+  val rename = new SettingsGroup(
+    title = "Renaming symbols",
+    schema = Rename
+  )
   object Rename extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
       title = "Enable renaming symbols",
-      order = 1,
+      description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
     )
   }
 
