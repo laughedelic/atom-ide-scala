@@ -10,6 +10,7 @@ object Exports {
 
   @JSExportTopLevel("config")
   val config = Config.init("ide-scala")
+  client.getLogger().debug(js.JSON.stringify(config, space = 2))
 
   @JSExportTopLevel("activate")
   def activate(): Unit = {
