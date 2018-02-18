@@ -46,6 +46,6 @@ resolvers += Resolver.bintrayRepo("laughedelic", "maven")
 
 libraryDependencies ++= Seq(
   "io.scalajs" %%% "nodejs" % "0.4.2",
-  "laughedelic" %%% "scalajs-atom-api" % "0.6.0",
+  "laughedelic" %%% "scalajs-atom-api" % "0.6.0+3-0d95f37f",
   "laughedelic" %%% "scalajs-java-home" % "0.1.0"
 )
