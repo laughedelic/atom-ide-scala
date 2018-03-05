@@ -6,9 +6,9 @@ import play.api.libs.json._
 import org.scalajs.sbtplugin.ScalaJSPlugin, ScalaJSPlugin.autoImport._
 import org.scalajs.core.tools.linker.standard._
 
-case object AtomPackagePlugin extends AutoPlugin {
+case object AtomPackageJson extends AutoPlugin {
 
-  override def requires = ScalaJSPlugin
+  override def requires = AtomPackageBase
   override def trigger = noTrigger
 
   case object autoImport {

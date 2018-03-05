@@ -33,7 +33,7 @@ scalacOptions ++= Seq(
   "-P:scalajs:sjsDefinedByDefault"
 )
 
-enablePlugins(AtomPackagePlugin)
+enablePlugins(AtomPackage)
 
 resolvers += Resolver.jcenterRepo
 
