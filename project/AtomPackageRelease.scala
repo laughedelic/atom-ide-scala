@@ -49,7 +49,6 @@ case object AtomPackageRelease extends AutoPlugin {
     if (exitCode == 0) Def.task {
       Seq("apm", "view", "ide-scala").!(log)
       git("checkout", "--quiet", "-")
-      IO.write(changelog, "")
     } else Def.task {
       // Revert the tag
       git("checkout", "--quiet", "-")
