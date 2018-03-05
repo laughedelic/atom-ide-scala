@@ -7,7 +7,7 @@
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)](https://gitter.im/laughedelic/atom-ide-scala)
 
-Scala language support for [Atom IDE], powered by [Scalameta language server].
+Scala language support for [Atom IDE], powered by [Metals] :metal:
 
 ![](https://user-images.githubusercontent.com/766656/34135911-aa78092a-e463-11e7-9fdf-710a8deb4093.png)
 
@@ -17,7 +17,7 @@ The project is in active development and may have some rough edges. You are welc
 
 This plugin is written in **[Scala.js]**, so if you are a Scala developer looking for better development experience in Atom, you're encouraged to contribute. Check the [contributing guide](CONTRIBUTING.md) and [open issues](https://github.com/laughedelic/atom-ide-scala/issues) especially the ones marked with `help wanted` label.
 
-The work of this plugin is to launch the language server and wire communication with it to the Atom IDE services. Most of the interesting stuff is happening on the server side, so check also the [scalameta/language-server](https://github.com/scalameta/language-server) project.
+The work of this plugin is to launch the language server and wire communication with it to the Atom IDE services. Most of the interesting stuff is happening on the server side, so check also the [scalameta/metals](https://github.com/scalameta/metals) project.
 
 ## Features
 
@@ -49,7 +49,7 @@ Here is a list of the features which are implemented. It doesn't mean that they 
 
 See also default [Atom IDE keybindings](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/keybindings.md).
 
-For the full list of implemented and planned features see the [server roadmap](https://github.com/scalameta/language-server/blob/master/README.md#roadmap).
+For the full list of implemented and planned features see the [server roadmap](https://github.com/scalameta/metals/blob/master/README.md#roadmap).
 
 ## Installation
 
@@ -69,7 +69,7 @@ For the full list of implemented and planned features see the [server roadmap](h
 
 ## Usage
 
-1. Follow Scalameta language server [beta testing instructions](https://github.com/scalameta/language-server/blob/master/BETA.md) to prepare your Scala projects.
+1. Follow Metals [beta testing instructions](https://github.com/scalameta/metals/blob/master/BETA.md) to prepare your Scala projects.
 2. Open a project in Atom. Once you open a Scala file, server will get launched and you will see a progress indicator in the status bar.
 3. Notice that when you close all tabs with Scala files, language server will be stopped. See [atom-languageclient#141](https://github.com/atom/atom-languageclient/issues/141) for discussion on this behavior.
 
@@ -77,5 +77,5 @@ For the full list of implemented and planned features see the [server roadmap](h
 [Scala]: http://scala-lang.org/
 [Scala.js]: https://www.scala-js.org/
 [Atom IDE]: https://ide.atom.io/
-[Scalameta language server]: https://github.com/scalameta/language-server
+[Metals]: https://github.com/scalameta/metals
 [LSP]: https://github.com/Microsoft/language-server-protocol

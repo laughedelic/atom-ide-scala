@@ -14,54 +14,6 @@ getCoursier := {
   file
 }
 
-// TODO: typed config definition in the code
-apmConfigSchema := Json.obj(
-  "serverType" -> Json.obj(
-    "order" -> 1,
-    "type" -> "string",
-    "title" -> "Language Server Type",
-    "description" -> "Don't change this option unless you know what you're doing",
-    "default" -> "scalameta",
-    "enum" -> Json.arr(
-      Json.obj(
-        "value" -> "scalameta",
-        "description" -> "Scalameta"
-      ),
-      Json.obj(
-        "value" -> "ensime",
-        "description" -> "ENSIME (experimental)"
-      )
-    )
-  ),
-  "serverVersion" -> Json.obj(
-    "order" -> 2,
-    "type" -> "string",
-    "title" -> "Language Server Version",
-    "default" -> "5ddb92a9"
-  ),
-  "jvm" -> Json.obj(
-    "order" -> 3,
-    "type" -> "object",
-    "title" -> "Java-related settings",
-    "properties" -> Json.obj(
-      "javaHome" -> Json.obj(
-        "type" -> "string",
-        "title" -> "Java Home",
-        "description" -> "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
-        "default" -> ""
-      ),
-      "javaOpts" -> Json.obj(
-        "type" -> "array",
-        "title" -> "Extra JVM options",
-        "default" -> Json.arr(),
-        "items" -> Json.obj(
-          "type" -> "string"
-        )
-      )
-    )
-  )
-)
-
 apmKeywords := Seq(
   "scala",
   "scalameta",
@@ -77,7 +29,7 @@ apmEngines := Map(
 )
 
 apmDependencies := Map(
-  "atom-languageclient" -> "0.7.3",
+  "atom-languageclient" -> "0.8.3",
   "atom-package-deps" -> "4.6.1",
   "find-java-home" -> "0.2.0"
 )

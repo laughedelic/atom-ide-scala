@@ -2,13 +2,16 @@ language: scala
 jdk: oraclejdk8
 scala: 2.12.4
 
+git:
+  depth: false
+
 stages:
-  - name: test
+  - name: build
 
 jobs:
   include:
-    # default stage is test
-    - script: sbt package
+    - stage: build
+      script: sbt package
 
 branches:
   only: master

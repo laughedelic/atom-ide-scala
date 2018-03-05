@@ -75,16 +75,21 @@ workingDir/
 src/main/main.iml
 *.pem
 
+# Eclipse
+.project
+.settings/
+
 .tags*
 .ensime*
 .classpath*
 .atom*
 .imdone*
-.metaserver/
+.metals/
 
 # APM
 lib/
 package.json
+package-lock.json
 
 CHANGELOG.md
 coursier
