@@ -19,7 +19,6 @@ case object AtomPackageJson extends AutoPlugin {
     lazy val apmDependencies = settingKey[Map[String, String]]("dependencies value in the package.json")
     lazy val apmConsumedServices = settingKey[Map[String, Map[String, String]]]("consumedServices value in the package.json")
     lazy val apmProvidedServices = settingKey[Map[String, Map[String, String]]]("providedServices value in the package.json")
-    lazy val apmConfigSchema = settingKey[JsObject]("configSchema value in the package.json")
 
     lazy val apmJson = settingKey[JsObject]("JSON object with the values derived from the sbt settings")
     lazy val apmJsonExtra = settingKey[JsObject]("JSON object which will be appended to apmJson in the generated package.json")
@@ -54,7 +53,6 @@ case object AtomPackageJson extends AutoPlugin {
     apmDependencies := Map(),
     apmConsumedServices := Map(),
     apmProvidedServices := Map(),
-    apmConfigSchema := Json.obj(),
 
     apmJsonFile := baseDirectory.value / "package.json",
     apmJsonExtra := Json.obj(),
@@ -90,8 +88,7 @@ case object AtomPackageJson extends AutoPlugin {
         "engines" -> apmEngines.value,
         "dependencies" -> apmDependencies.value,
         "consumedServices" -> apmConsumedServices.value,
-        "providedServices" -> apmProvidedServices.value,
-        "configSchema" -> apmConfigSchema.value
+        "providedServices" -> apmProvidedServices.value
       )
     },
 
