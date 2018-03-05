@@ -3,11 +3,13 @@ package laughedelic.sbt
 import sbt._, Keys._, complete._, DefaultParsers._
 import scala.io.AnsiColor._
 import play.api.libs.json._
+import org.scalajs.sbtplugin.ScalaJSPlugin, ScalaJSPlugin.autoImport._
+import org.scalajs.core.tools.linker.standard._
 
-case object PublishMore extends AutoPlugin {
+case object AtomPackagePlugin extends AutoPlugin {
 
-  override def trigger = allRequirements
-  // ScalaJSPlugin
+  override def requires = ScalaJSPlugin
+  override def trigger = noTrigger
 
   case object autoImport {
 
@@ -19,8 +21,9 @@ case object PublishMore extends AutoPlugin {
     lazy val apmProvidedServices = settingKey[Map[String, Map[String, String]]]("providedServices value in the package.json")
     lazy val apmConfigSchema = settingKey[JsObject]("configSchema value in the package.json")
 
-    lazy val apmJson = settingKey[JsObject]("")
-    lazy val apmPackageJson = settingKey[File]("Path to the generated package.json file")
+    lazy val apmJson = settingKey[JsObject]("JSON object with the values derived from the sbt settings")
+    lazy val apmJsonExtra = settingKey[JsObject]("JSON object which will be appended to apmJson in the generated package.json")
+    lazy val apmJsonFile = settingKey[File]("Path to the generated package.json file")
 
     lazy val packageJson = settingKey[File]("Generates package.json for apm")
   }
@@ -36,15 +39,15 @@ case object PublishMore extends AutoPlugin {
 
     // Following atom packages convention: lib/main.js is the plugin's entry point
     apmMain := baseDirectory.value / "lib" / "main.js",
-    artifactPath in (Compile, fullOptJS) := apmMain,
-    artifactPath in (Compile, fastOptJS) := apmMain,
+    artifactPath in (Compile, fullOptJS) := apmMain.value,
+    artifactPath in (Compile, fastOptJS) := apmMain.value,
 
     packageBin in Compile := fullOptJS.in(Compile).value.data,
     // Main task that packages this Atom plugin
     sbt.Keys.`package` in Compile := (packageBin in Compile).value,
 
     cleanFiles ++= Seq(
-      apmMain
+      apmMain.value
     ),
 
     apmKeywords := Seq(),
@@ -54,15 +57,25 @@ case object PublishMore extends AutoPlugin {
     apmConfigSchema := Json.obj(),
 
     apmJsonFile := baseDirectory.value / "package.json",
+    apmJsonExtra := Json.obj(),
     apmJson := {
-      val author = developers.value.head
-      val repository = scmInfo.value.get.browseUrl.toString
-      val mainJs = (artifactPath in (Compile, fullOptJS)).value
-      val licenseName = licenses.value.head._1
+      val mainJs = baseDirectory.value.toPath.relativize(apmMain.value.toPath)
+
+      val author = developers.value.headOption.getOrElse {
+        sys.error("You need to set the `developers` key")
+      }
+
+      val repository = scmInfo.value.getOrElse {
+        sys.error("You need to set the `scmInfo` key")
+      }.browseUrl.toString
+
+      val licenseName = licenses.value.headOption.getOrElse {
+        sys.error("You need to set the `licenses` key")
+      }._1
 
       Json.obj(
         "name" -> name.value.stripPrefix("atom-"),
-        "main" -> s"./${mainJs.relativeTo(baseDirectory.value).get}",
+        "main" -> s"./${mainJs}",
         "version" -> version.value,
         "description" -> description.value,
         "author" -> Json.obj(
@@ -73,30 +86,21 @@ case object PublishMore extends AutoPlugin {
         "repository" -> repository,
         "bugs"       -> s"${repository}/issues",
         "license" -> licenseName,
-        "keywords" -> Json.arr(
-          apmKeywords.value.distinct: _*
-        ),
-        "engines" -> Json.obj(
-          apmEngines.value.toSeq: _*
-        ),
-        "dependencies" -> Json.obj(
-          apmDependencies.value.toSeq: _*
-        ),
-        "consumedServices" -> Json.obj(
-          apmConsumedServices.value.toSeq: _*
-        ),
-        "providedServices" -> Json.obj(
-          apmProvidedServices.value.toSeq: _*
-        ),
+        "keywords" -> apmKeywords.value.distinct,
+        "engines" -> apmEngines.value,
+        "dependencies" -> apmDependencies.value,
+        "consumedServices" -> apmConsumedServices.value,
+        "providedServices" -> apmProvidedServices.value,
         "configSchema" -> apmConfigSchema.value
       )
     },
 
     packageJson := {
-      val file = apmJsonFile.value
-      sLog.value.info(s"Writing ${file} ...")
-      IO.write(file, Json.prettyPrint(apmJson.value))
-      file
+      val relativePath = baseDirectory.value.toPath.relativize(apmJsonFile.value.toPath)
+      sLog.value.info(s"Writing ${relativePath} ...")
+      val json = apmJson.value ++ apmJsonExtra.value
+      IO.write(apmJsonFile.value, Json.prettyPrint(json))
+      apmJsonFile.value
     }
 
   )
