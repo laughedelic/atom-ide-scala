@@ -19,7 +19,7 @@ sealed trait ServerType {
 case object ServerType {
 
   case object Metals extends ServerType {
-    val name: String = "metals"
+    val name: String = "Metals"
     val description: String = "Metals (Scalameta language server)"
     val defaultVersion: String = "977c902b"
 
@@ -39,7 +39,7 @@ case object ServerType {
   }
 
   case object Ensime extends ServerType {
-    val name: String = "ensime"
+    val name: String = "Ensime"
     val description: String = "ENSIME (experimental)"
     val defaultVersion: String = "3.0.0-SNAPSHOT"
 
@@ -73,8 +73,8 @@ case object ServerType {
   def fromName(name: String): Option[ServerType] =
     name.toLowerCase match {
       case "scalameta" => Some(Metals)
-      case Metals.name => Some(Metals)
-      case Ensime.name => Some(Ensime)
+      case Metals.name.toLowerCase => Some(Metals)
+      case Ensime.name.toLowerCase => Some(Ensime)
       case _ => None
     }
 
