@@ -71,10 +71,10 @@ case object ServerType {
   }
 
   def fromName(name: String): Option[ServerType] =
-    name.toLowerCase match {
+    name match {
       case "scalameta" => Some(Metals)
-      case Metals.name.toLowerCase => Some(Metals)
-      case Ensime.name.toLowerCase => Some(Ensime)
+      case Metals.name => Some(Metals)
+      case Ensime.name => Some(Ensime)
       case _ => None
     }
 
