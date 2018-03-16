@@ -76,6 +76,14 @@ object MetalsConfig extends ConfigSchema {
     )
   }
 
+  val highlight = new SettingsGroup(Highlight, "Symbol highlights")
+  object Highlight extends ConfigSchema {
+    val enabled = new Setting[Boolean](
+      default = false,
+      title = "Enable symbol highlights",
+    )
+  }
+
   val sbt = new SettingsGroup(Sbt, "sbt server integration")
   object Sbt extends ConfigSchema {
     val enabled = new Setting[Boolean](
@@ -143,12 +151,10 @@ object MetalsConfig extends ConfigSchema {
       default = true,
       title = "Enable indexing of the classpath"
     )
-    // TODO: uncomment when https://github.com/scalameta/metals/issues/43 is fixed
-    // val indexJDK = new Setting[Boolean](
-    //   default = false,
-    //   title = "Enable indexing of the JDK",
-    //   description = "⚠️ EXPERIMENTAL",
-    // )
+    val indexJDK = new Setting[Boolean](
+      default = true,
+      title = "Enable indexing of the JDK"
+    )
   }
 
   // TODO: uncomment when it's supported in Atom IDE
