@@ -45,5 +45,7 @@ object Exports {
   def consumeBusySignal(service: BusySignalService): Unit = client.consumeBusySignal(service)
   @JSExportTopLevel("consumeSignatureHelp")
   def consumeSignatureHelp(registry: js.Any): js.Any = client.consumeSignatureHelp(registry)
+  @JSExportTopLevel("consumeConsole")
+  def consumeConsole(service: js.Any): js.Any = client.asInstanceOf[js.Dynamic].consumeConsole(service)
 
 }

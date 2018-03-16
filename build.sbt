@@ -79,7 +79,8 @@ apmConsumedServices := Map(
   "linter-indie"          -> Map("2.0.0" -> "consumeLinterV2"),
   "datatip"               -> Map("0.1.0" -> "consumeDatatip"),
   "atom-ide-busy-signal"  -> Map("0.1.0" -> "consumeBusySignal"),
-  "signature-help"        -> Map("0.1.0" -> "consumeSignatureHelp")
+  "signature-help"        -> Map("0.1.0" -> "consumeSignatureHelp"),
+  "console"               -> Map("0.1.0" -> "consumeConsole"),
 )
 
 apmProvidedServices := Map(
