@@ -128,11 +128,10 @@ object MetalsConfig extends ConfigSchema {
     )
     // TODO: uncomment when willSaveWaitUntil is supported in atom-languageclient
     // TODO: check ide-ui "Format on save" option and warn if both are on
-    // val onSave = new Setting[Boolean](
-    //   default = false,
-    //   title = "Format file before saving it",
-    //   description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
-    // )
+    val onSave = new Setting[Boolean](
+      default = false,
+      title = "Format file before saving it"
+    )
     val version = new Setting[String](
       default = "1.4.0",
       title =
