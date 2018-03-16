@@ -80,22 +80,6 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     serverProcess
   }
 
-  override def preInitialization(connection: LanguageClientConnection): Unit = {
-    // NOTE: a workaround for repeating notifications (it should be fixed in atom-notifications)
-    // On every new notification it goes through all matching old notifications and dismisses them.
-    // We can do it only after the fact. Also we cannot dismiss the new one instead, because if some
-    // old ones were dismissed manually, user won't see the new notifications.
-    Atom.notifications.onDidAddNotification { newOne =>
-      val notifications = Atom.notifications.getNotifications()
-      val matching = notifications.filter { oldOne =>
-        oldOne != newOne &&
-        oldOne.getType() == newOne.getType() &&
-        oldOne.getMessage() == newOne.getMessage()
-      }
-      matching.foreach { _.dismiss() }
-    }
-  }
-
   override def postInitialization(server: ActiveServer): Unit = {
     val serverSupportedCommands = server.capabilities.executeCommandProvider.map(_.commands.toSet).getOrElse(Set.empty)
 
