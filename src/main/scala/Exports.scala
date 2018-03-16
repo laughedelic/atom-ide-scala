@@ -46,6 +46,6 @@ object Exports {
   @JSExportTopLevel("consumeSignatureHelp")
   def consumeSignatureHelp(registry: js.Any): js.Any = client.consumeSignatureHelp(registry)
   @JSExportTopLevel("consumeConsole")
-  def consumeConsole(service: js.Any): js.Any = client.asInstanceOf[js.Dynamic].consumeConsole(service)
+  def consumeConsole(service: js.Any): js.Any = client.consumeConsole(service)
 
 }
