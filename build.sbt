@@ -70,7 +70,7 @@ apmKeywords := Seq(
 apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
 
 apmDependencies := Map(
-  "atom-languageclient" -> "0.8.3",
+  "atom-languageclient" -> "file:/../atom-languageclient",
   "atom-package-deps" -> "4.6.1",
   "find-java-home" -> "0.2.0"
 )
