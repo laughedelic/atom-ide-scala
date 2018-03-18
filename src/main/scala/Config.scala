@@ -10,14 +10,9 @@ object Config extends ConfigSchema {
   val serverType = new Setting[String](
     title = "Language Server",
     default = ServerType.Metals.name,
-    enum = js.Array(new AllowedValue(
-      ServerType.Metals.name,
-      ServerType.Metals.description
-    ))
-    // TODO: uncomment this when ENSIME support is ready for beta
-    // enum = ServerType.values.map { st =>
-    //   new AllowedValue(st.name, st.description)
-    // }.toJSArray,
+    enum = ServerType.values.map { st =>
+      new AllowedValue(st.name, st.description)
+    }.toJSArray,
   )
 
   val serverVersion = new Setting[String](
@@ -35,22 +30,21 @@ object Config extends ConfigSchema {
     collapsed = true,
   )
 
-  // TODO: uncomment this when there is more than 1 server
-  // override def init(prefix: String): ConfigSchema = {
-  //   val schema = super.init(prefix)
-  //   // This toggles server version depending on the chosen server type
-  //   serverType.onDidChange({ change: SettingChange[String] =>
-  //     for {
-  //       oldValue <- change.oldValue
-  //       oldST <- ServerType.fromName(oldValue)
-  //         // NOTE: if the version is changed, we don't want to overwrite it
-  //         if oldST.defaultVersion == Config.serverVersion.get
-  //       newST <- ServerType.fromName(change.newValue)
-  //     } yield
-  //       Config.serverVersion.set(newST.defaultVersion)
-  //   })
-  //   schema
-  // }
+  override def init(prefix: String): ConfigSchema = {
+    val schema = super.init(prefix)
+    // This toggles server version depending on the chosen server type
+    serverType.onDidChange({ change: SettingChange[String] =>
+      for {
+        oldValue <- change.oldValue
+        oldST <- ServerType.fromName(oldValue)
+          // NOTE: if the version is changed, we don't want to overwrite it
+          if oldST.defaultVersion == Config.serverVersion.get
+        newST <- ServerType.fromName(change.newValue)
+      } yield
+        Config.serverVersion.set(newST.defaultVersion)
+    })
+    schema
+  }
 }
 
 object JavaConfig extends ConfigSchema {
