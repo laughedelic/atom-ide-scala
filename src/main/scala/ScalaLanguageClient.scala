@@ -6,7 +6,7 @@ import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
 import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.os.OS
 import io.scalajs.nodejs.fs.Fs
-import laughedelic.atom.{ Atom, NotificationOptions }
+import laughedelic.atom.{ Atom, NotificationOptions, TextEditor }
 import laughedelic.atom.languageclient._
 import laughedelic.atom.ide.ui.busysignal._
 import laughedelic.scalajs.findJavaHome
@@ -19,6 +19,8 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
   override def getLanguageName(): String = "Scala"
   override def getServerName(): String = server.name
+  override def shouldStartForEditor(editor: TextEditor): Boolean =
+    editor.getURI.map(_.endsWith(".scala")).getOrElse(false)
 
   override def filterChangeWatchedFiles(filePath: String): Boolean =
     server.watchFilter(filePath)
