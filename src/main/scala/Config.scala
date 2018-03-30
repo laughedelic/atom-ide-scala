@@ -134,7 +134,7 @@ object MetalsConfig extends ConfigSchema {
   object Scalafix extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
-      title = "Enable Scalafix diagnostics",
+      title = "Enable Scalafix diagnostics (if configuration file is present)",
     )
     val confPath = new Setting[String](
       default = ".scalafix.conf",
@@ -147,7 +147,7 @@ object MetalsConfig extends ConfigSchema {
   object Scalafmt extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
-      title = "Enable formatting with Scalafmt",
+      title = "Enable formatting with Scalafmt (if configuration file is present)",
     )
     // TODO: uncomment when willSaveWaitUntil is supported in atom-languageclient
     // TODO: check ide-ui "Format on save" option and warn if both are on
