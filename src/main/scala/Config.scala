@@ -2,7 +2,7 @@ package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.Dynamic.global, js.JSConverters._
 import scala.scalajs.js.Dictionary
-import laughedelic.atom.{ Atom, ConfigChange }
+import laughedelic.atom.{ Atom, ConfigChange, NotificationOptions }
 import laughedelic.atom.config._
 
 object Config extends ConfigSchema {
@@ -35,22 +35,45 @@ object Config extends ConfigSchema {
     collapsed = true,
   )
 
-  // TODO: uncomment this when there is more than 1 server
-  // override def init(prefix: String): ConfigSchema = {
-  //   val schema = super.init(prefix)
-  //   // This toggles server version depending on the chosen server type
-  //   serverType.onDidChange({ change: SettingChange[String] =>
-  //     for {
-  //       oldValue <- change.oldValue
-  //       oldST <- ServerType.fromName(oldValue)
-  //         // NOTE: if the version is changed, we don't want to overwrite it
-  //         if oldST.defaultVersion == Config.serverVersion.get
-  //       newST <- ServerType.fromName(change.newValue)
-  //     } yield
-  //       Config.serverVersion.set(newST.defaultVersion)
-  //   })
-  //   schema
-  // }
+  override def init(prefix: String): ConfigSchema = {
+    val schema = super.init(prefix)
+    // TODO: uncomment this when there is more than 1 server
+    // // This toggles server version depending on the chosen server type
+    // serverType.onDidChange({ change: SettingChange[String] =>
+    //   for {
+    //     oldValue <- change.oldValue
+    //     oldST <- ServerType.fromName(oldValue)
+    //       // NOTE: if the version is changed, we don't want to overwrite it
+    //       if oldST.defaultVersion == Config.serverVersion.get
+    //     newST <- ServerType.fromName(change.newValue)
+    //   } yield
+    //     Config.serverVersion.set(newST.defaultVersion)
+    // })
+
+    metals.scalafmt.onSave.onDidChange { change =>
+      if (change.newValue == true) {
+        val ideUiOnSaveRaw =
+          Atom.config.get("atom-ide-ui.atom-ide-code-format.formatOnSave")
+        val ideUiOnSave = js.defined(
+            ideUiOnSaveRaw.asInstanceOf[Boolean]
+          ).getOrElse(false)
+
+        if (ideUiOnSave == true) {
+          Atom.notifications.addWarning(
+            "Scalafmt on Save coflicts with general Format on Save",
+            new NotificationOptions(
+              dismissable = true,
+              description = "General **Format on Save** setting is already enabled. If you want to enable **Scalafmt on Save**, first disable **Format on Save** in the Atom IDE UI settings."
+              // TODO: Link to atom://settings-view/show-package?package=atom-ide-ui (now it doesn't work in notifications)
+            )
+          )
+          // TODO: Unset it. This doesn't work for some reason:
+          // metals.scalafmt.onSave.set(false)
+        }
+      }
+    }
+    schema
+  }
 }
 
 object JavaConfig extends ConfigSchema {
@@ -111,7 +134,7 @@ object MetalsConfig extends ConfigSchema {
   object Scalafix extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
-      title = "Enable Scalafix diagnostics",
+      title = "Enable Scalafix diagnostics (if configuration file is present)",
     )
     val confPath = new Setting[String](
       default = ".scalafix.conf",
@@ -124,15 +147,14 @@ object MetalsConfig extends ConfigSchema {
   object Scalafmt extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
-      title = "Enable formatting with Scalafmt",
+      title = "Enable formatting with Scalafmt (if configuration file is present)",
     )
     // TODO: uncomment when willSaveWaitUntil is supported in atom-languageclient
     // TODO: check ide-ui "Format on save" option and warn if both are on
-    // val onSave = new Setting[Boolean](
-    //   default = false,
-    //   title = "Format file before saving it",
-    //   description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
-    // )
+    val onSave = new Setting[Boolean](
+      default = false,
+      title = "Format file before saving it"
+    )
     val version = new Setting[String](
       default = "1.4.0",
       title =
