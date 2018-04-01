@@ -161,8 +161,6 @@ object MetalsConfig extends ConfigSchema {
       default = true,
       title = "Enable formatting with Scalafmt (if configuration file is present)",
     )
-    // TODO: uncomment when willSaveWaitUntil is supported in atom-languageclient
-    // TODO: check ide-ui "Format on save" option and warn if both are on
     val onSave = new Setting[Boolean](
       default = false,
       title = "Format file before saving it"
