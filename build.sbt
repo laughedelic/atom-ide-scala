@@ -101,6 +101,9 @@ apmJsonExtra := Json.obj(
   "package-deps" -> Json.arr(
     "language-scala",
     "atom-ide-ui"
+  ),
+  "activationHooks" -> Json.arr(
+    "language-scala:grammar-used"
   )
 )
 
