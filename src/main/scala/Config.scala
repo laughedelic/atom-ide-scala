@@ -122,12 +122,24 @@ object MetalsConfig extends ConfigSchema {
 
   val scalac = new SettingsGroup(Scalac, "Presentation compiler")
   object Scalac extends ConfigSchema {
-    val enabled = new Setting[Boolean](
-      default = false,
-      title =
-        "Enable diagnostics and completions as you type with the Scala Presentation Compiler",
-      description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
-    )
+
+    val completions = new SettingsGroup(Completions, "Completions as you type")
+    object Completions extends ConfigSchema {
+      val enabled = new Setting[Boolean](
+        default = false,
+        title = "Enable completions with the Scala Presentation Compiler",
+        description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
+      )
+    }
+
+    val diagnostics = new SettingsGroup(Diagnostics, "Diagnostics as you type")
+    object Diagnostics extends ConfigSchema {
+      val enabled = new Setting[Boolean](
+        default = false,
+        title = "Enable diagnostics with the Scala Presentation Compiler",
+        description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
+      )
+    }
   }
 
   val scalafix = new SettingsGroup(Scalafix, "Code linting with Scalafix")
@@ -149,8 +161,6 @@ object MetalsConfig extends ConfigSchema {
       default = true,
       title = "Enable formatting with Scalafmt (if configuration file is present)",
     )
-    // TODO: uncomment when willSaveWaitUntil is supported in atom-languageclient
-    // TODO: check ide-ui "Format on save" option and warn if both are on
     val onSave = new Setting[Boolean](
       default = false,
       title = "Format file before saving it"
