@@ -23,10 +23,7 @@ case object ServerType {
     val description: String = "Metals (Scalameta language server)"
     val defaultVersion: String = "e1b3a1fa"
 
-    def javaArgs(projectPath: String): Seq[String] = Seq(
-      "-XX:+UseG1GC",
-      "-XX:+UseStringDeduplication",
-    )
+    def javaArgs(projectPath: String): Seq[String] = Seq()
 
     def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = Seq(
       "--repository", "bintray:scalameta/maven",

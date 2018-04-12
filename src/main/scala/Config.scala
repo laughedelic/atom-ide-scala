@@ -79,7 +79,10 @@ object Config extends ConfigSchema {
 object JavaConfig extends ConfigSchema {
   val extraArgs = new Setting[js.Array[String]](
     title = "Extra JVM options",
-    default = js.Array()
+    default = js.Array(
+      "-XX:+UseG1GC",
+      "-XX:+UseStringDeduplication",
+    )
   )
 
   val home = new Setting[String](
