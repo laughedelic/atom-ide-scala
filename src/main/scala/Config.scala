@@ -101,6 +101,7 @@ object MetalsConfig extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = false,
       title = "Enable symbol highlights",
+      description = "⚠️ EXPERIMENTAL: not stable (may misbehave when editing sources)",
     )
   }
 
@@ -111,10 +112,9 @@ object MetalsConfig extends ConfigSchema {
       val enabled = new Setting[Boolean](
         default = true,
         title = "Enable diagnostics from the sbt server",
-        description = "⚠️ EXPERIMENTAL: requires sbt v1.1+ (launch it manually)",
+        description = "Requires sbt v1.1+ (launch it manually)",
       )
     }
-
     val command = new Setting[String](
       default = "",
       title = "sbt command to run on file save"
@@ -123,7 +123,6 @@ object MetalsConfig extends ConfigSchema {
 
   val scalac = new SettingsGroup(Scalac, "Presentation compiler")
   object Scalac extends ConfigSchema {
-
     val completions = new SettingsGroup(Completions, "Completions as you type")
     object Completions extends ConfigSchema {
       val enabled = new Setting[Boolean](
@@ -132,7 +131,6 @@ object MetalsConfig extends ConfigSchema {
         description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
       )
     }
-
     val diagnostics = new SettingsGroup(Diagnostics, "Diagnostics as you type")
     object Diagnostics extends ConfigSchema {
       val enabled = new Setting[Boolean](
@@ -151,8 +149,7 @@ object MetalsConfig extends ConfigSchema {
     )
     val confPath = new Setting[String](
       default = ".scalafix.conf",
-      title =
-        "Path to the Scalafix configuration, relative to the workspace path"
+      title = "Path to the Scalafix configuration, relative to the workspace path"
     )
   }
 
@@ -164,7 +161,8 @@ object MetalsConfig extends ConfigSchema {
     )
     val onSave = new Setting[Boolean](
       default = false,
-      title = "Format file before saving it"
+      title = "Format file before saving it",
+      description = "⚠️ EXPERIMENTAL: Atom feature in development",
     )
     val version = new Setting[String](
       default = "1.4.0",
