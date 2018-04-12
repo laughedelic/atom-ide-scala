@@ -9,15 +9,11 @@ object Config extends ConfigSchema {
 
   val serverType = new Setting[String](
     title = "Language Server",
+    description = "Changing this setting requires reload of the plugin",
     default = ServerType.Metals.name,
-    enum = js.Array(new AllowedValue(
-      ServerType.Metals.name,
-      ServerType.Metals.description
-    ))
-    // TODO: uncomment this when ENSIME support is ready for beta
-    // enum = ServerType.values.map { st =>
-    //   new AllowedValue(st.name, st.description)
-    // }.toJSArray,
+    enum = ServerType.values.map { st =>
+      new AllowedValue(st.name, st.description)
+    }.toJSArray,
   )
 
   val serverVersion = new Setting[String](
@@ -37,18 +33,17 @@ object Config extends ConfigSchema {
 
   override def init(prefix: String): ConfigSchema = {
     val schema = super.init(prefix)
-    // TODO: uncomment this when there is more than 1 server
-    // // This toggles server version depending on the chosen server type
-    // serverType.onDidChange({ change: SettingChange[String] =>
-    //   for {
-    //     oldValue <- change.oldValue
-    //     oldST <- ServerType.fromName(oldValue)
-    //       // NOTE: if the version is changed, we don't want to overwrite it
-    //       if oldST.defaultVersion == Config.serverVersion.get
-    //     newST <- ServerType.fromName(change.newValue)
-    //   } yield
-    //     Config.serverVersion.set(newST.defaultVersion)
-    // })
+    // This toggles server version depending on the chosen server type
+    serverType.onDidChange({ change: SettingChange[String] =>
+      for {
+        oldValue <- change.oldValue
+        oldST <- ServerType.fromName(oldValue)
+          // NOTE: if the version is changed, we don't want to overwrite it
+          if oldST.defaultVersion == Config.serverVersion.get
+        newST <- ServerType.fromName(change.newValue)
+      } yield
+        Config.serverVersion.set(newST.defaultVersion)
+    })
 
     metals.scalafmt.onSave.onDidChange { change =>
       if (change.newValue == true) {

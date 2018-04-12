@@ -14,6 +14,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   import ScalaLanguageClient._
 
   private lazy val server: ServerType = ServerType.fromConfig
+  private lazy val serverID: String = server.name.toLowerCase
 
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
   override def getLanguageName(): String = "Scala"
@@ -58,7 +59,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     commands.foreach { cmd =>
       Atom.commands.add(
         "atom-text-editor",
-        s"${server.name.toLowerCase}:${toAtomCommand(cmd)}",
+        s"${serverID}:${toAtomCommand(cmd)}",
         { _ =>
           activeServer.connection.executeCommand(
             new ExecuteCommandParams(command = cmd)
@@ -68,11 +69,12 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   }
 
   override def getRootConfigurationKey(): String =
-    "ide-scala.metals"
+    s"ide-scala.${serverID}"
 
   override def mapConfigurationObject(configuration: js.Any): js.Any =
+    // TODO: review when Dotty LS has a configuration
     js.Dynamic.literal(
-      metals = configuration
+      serverID -> configuration
     )
 }
 
