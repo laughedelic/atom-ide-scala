@@ -109,14 +109,18 @@ object MetalsConfig extends ConfigSchema {
 
   val sbt = new SettingsGroup(Sbt, "sbt server integration")
   object Sbt extends ConfigSchema {
-    val enabled = new Setting[Boolean](
-      default = false,
-      title = "Use sbt server to run a command on file save and report diagnostics",
-      description = "⚠️ EXPERIMENTAL: requires sbt v1.1 (launch sbt manually and use _Sbt Connect_ command)",
-    )
+    val diagnostics = new SettingsGroup(Diagnostics, "Diagnostics on save")
+    object Diagnostics extends ConfigSchema {
+      val enabled = new Setting[Boolean](
+        default = true,
+        title = "Enable diagnostics from the sbt server",
+        description = "⚠️ EXPERIMENTAL: requires sbt v1.1+ (launch it manually)",
+      )
+    }
+
     val command = new Setting[String](
-      default = "test:compile",
-      title = "Which sbt command to run on file save"
+      default = "",
+      title = "sbt command to run on file save"
     )
   }
 
@@ -167,8 +171,7 @@ object MetalsConfig extends ConfigSchema {
     )
     val version = new Setting[String](
       default = "1.4.0",
-      title =
-        "Version of Scalafmt to use"
+      title = "Version of Scalafmt to use"
     )
     val confPath = new Setting[String](
       default = ".scalafmt.conf",
