@@ -42,7 +42,6 @@ resolvers += Resolver.bintrayRepo("laughedelic", "maven")
 libraryDependencies ++= Seq(
   "io.scalajs" %%% "nodejs" % "0.4.2",
   "laughedelic" %%% "scalajs-atom-api" % "0.6.0+5-c464d2a3",
-  "laughedelic" %%% "scalajs-java-home" % "0.1.0"
 )
 
 lazy val getCoursier: Def.Initialize[Task[File]] = Def.task {
@@ -70,9 +69,8 @@ apmKeywords := Seq(
 apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
 
 apmDependencies := Map(
-  "atom-languageclient" -> "0.9.4",
+  "atom-languageclient" -> "0.9.5",
   "atom-package-deps" -> "4.6.1",
-  "find-java-home" -> "0.2.0"
 )
 
 apmConsumedServices := Map(
@@ -101,6 +99,9 @@ apmJsonExtra := Json.obj(
   "package-deps" -> Json.arr(
     "language-scala",
     "atom-ide-ui"
+  ),
+  "activationHooks" -> Json.arr(
+    "language-scala:grammar-used"
   )
 )
 

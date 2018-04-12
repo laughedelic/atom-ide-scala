@@ -2,7 +2,7 @@ package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.Dynamic.global, js.JSConverters._
 import scala.scalajs.js.Dictionary
-import laughedelic.atom.{ Atom, ConfigChange }
+import laughedelic.atom.{ Atom, ConfigChange, NotificationOptions }
 import laughedelic.atom.config._
 
 object Config extends ConfigSchema {
@@ -43,6 +43,29 @@ object Config extends ConfigSchema {
       } yield
         Config.serverVersion.set(newST.defaultVersion)
     })
+
+    metals.scalafmt.onSave.onDidChange { change =>
+      if (change.newValue == true) {
+        val ideUiOnSaveRaw =
+          Atom.config.get("atom-ide-ui.atom-ide-code-format.formatOnSave")
+        val ideUiOnSave = js.defined(
+            ideUiOnSaveRaw.asInstanceOf[Boolean]
+          ).getOrElse(false)
+
+        if (ideUiOnSave == true) {
+          Atom.notifications.addWarning(
+            "Scalafmt on Save coflicts with general Format on Save",
+            new NotificationOptions(
+              dismissable = true,
+              description = "General **Format on Save** setting is already enabled. If you want to enable **Scalafmt on Save**, first disable **Format on Save** in the Atom IDE UI settings."
+              // TODO: Link to atom://settings-view/show-package?package=atom-ide-ui (now it doesn't work in notifications)
+            )
+          )
+          // TODO: Unset it. This doesn't work for some reason:
+          // metals.scalafmt.onSave.set(false)
+        }
+      }
+    }
     schema
   }
 }
@@ -50,13 +73,10 @@ object Config extends ConfigSchema {
 object JavaConfig extends ConfigSchema {
   val extraArgs = new Setting[js.Array[String]](
     title = "Extra JVM options",
-    default = js.Array()
-  )
-
-  val home = new Setting[String](
-    title = "Java Home",
-    description = "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
-    default = "",
+    default = js.Array(
+      "-XX:+UseG1GC",
+      "-XX:+UseStringDeduplication",
+    )
   )
 }
 
@@ -75,42 +95,55 @@ object MetalsConfig extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = false,
       title = "Enable symbol highlights",
+      description = "⚠️ EXPERIMENTAL: not stable (may misbehave when editing sources)",
     )
   }
 
   val sbt = new SettingsGroup(Sbt, "sbt server integration")
   object Sbt extends ConfigSchema {
-    val enabled = new Setting[Boolean](
-      default = false,
-      title = "Use sbt server to run a command on file save and report diagnostics",
-      description = "⚠️ EXPERIMENTAL: requires sbt v1.1 (launch sbt manually and use _Sbt Connect_ command)",
-    )
+    val diagnostics = new SettingsGroup(Diagnostics, "Diagnostics on save")
+    object Diagnostics extends ConfigSchema {
+      val enabled = new Setting[Boolean](
+        default = true,
+        title = "Enable diagnostics from the sbt server",
+        description = "Requires sbt v1.1+ (launch it manually)",
+      )
+    }
     val command = new Setting[String](
-      default = "test:compile",
-      title = "Which sbt command to run on file save"
+      default = "",
+      title = "sbt command to run on file save"
     )
   }
 
   val scalac = new SettingsGroup(Scalac, "Presentation compiler")
   object Scalac extends ConfigSchema {
-    val enabled = new Setting[Boolean](
-      default = false,
-      title =
-        "Enable diagnostics and completions as you type with the Scala Presentation Compiler",
-      description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
-    )
+    val completions = new SettingsGroup(Completions, "Completions as you type")
+    object Completions extends ConfigSchema {
+      val enabled = new Setting[Boolean](
+        default = false,
+        title = "Enable completions with the Scala Presentation Compiler",
+        description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
+      )
+    }
+    val diagnostics = new SettingsGroup(Diagnostics, "Diagnostics as you type")
+    object Diagnostics extends ConfigSchema {
+      val enabled = new Setting[Boolean](
+        default = false,
+        title = "Enable diagnostics with the Scala Presentation Compiler",
+        description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
+      )
+    }
   }
 
   val scalafix = new SettingsGroup(Scalafix, "Code linting with Scalafix")
   object Scalafix extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
-      title = "Enable Scalafix diagnostics",
+      title = "Enable Scalafix diagnostics (if configuration file is present)",
     )
     val confPath = new Setting[String](
       default = ".scalafix.conf",
-      title =
-        "Path to the Scalafix configuration, relative to the workspace path"
+      title = "Path to the Scalafix configuration, relative to the workspace path"
     )
   }
 
@@ -118,19 +151,16 @@ object MetalsConfig extends ConfigSchema {
   object Scalafmt extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = true,
-      title = "Enable formatting with Scalafmt",
+      title = "Enable formatting with Scalafmt (if configuration file is present)",
     )
-    // TODO: uncomment when willSaveWaitUntil is supported in atom-languageclient
-    // TODO: check ide-ui "Format on save" option and warn if both are on
-    // val onSave = new Setting[Boolean](
-    //   default = false,
-    //   title = "Format file before saving it",
-    //   description = "⚠️ EXPERIMENTAL: not supported in Atom yet",
-    // )
+    val onSave = new Setting[Boolean](
+      default = false,
+      title = "Format file before saving it",
+      description = "⚠️ EXPERIMENTAL: Atom feature in development",
+    )
     val version = new Setting[String](
       default = "1.4.0",
-      title =
-        "Version of Scalafmt to use"
+      title = "Version of Scalafmt to use"
     )
     val confPath = new Setting[String](
       default = ".scalafmt.conf",
