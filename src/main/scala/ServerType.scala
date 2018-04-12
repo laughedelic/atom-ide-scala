@@ -23,10 +23,12 @@ case object ServerType {
     val description: String = "Metals (Scalameta language server)"
     val defaultVersion: String = "e1b3a1fa"
 
-    def javaArgs(projectPath: String): Seq[String] = Seq()
+    def javaArgs(projectPath: String): Seq[String] = Seq(
+      "-XX:+UseG1GC",
+      "-XX:+UseStringDeduplication",
+    )
 
     def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = Seq(
-      "--repository", "bintray:dhpcs/maven",
       "--repository", "bintray:scalameta/maven",
       s"org.scalameta:metals_2.12:${version}",
       "--main", "scala.meta.metals.Main"
@@ -34,7 +36,8 @@ case object ServerType {
 
     def watchFilter(filePath: String): Boolean = {
       filePath.endsWith(".semanticdb") ||
-      filePath.endsWith(".compilerconfig")
+      filePath.endsWith(".properties") ||
+      filePath.endsWith("active.json")
     }
   }
 
