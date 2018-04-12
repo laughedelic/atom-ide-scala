@@ -79,13 +79,10 @@ object Config extends ConfigSchema {
 object JavaConfig extends ConfigSchema {
   val extraArgs = new Setting[js.Array[String]](
     title = "Extra JVM options",
-    default = js.Array()
-  )
-
-  val home = new Setting[String](
-    title = "Java Home",
-    description = "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
-    default = "",
+    default = js.Array(
+      "-XX:+UseG1GC",
+      "-XX:+UseStringDeduplication",
+    )
   )
 }
 
@@ -104,25 +101,28 @@ object MetalsConfig extends ConfigSchema {
     val enabled = new Setting[Boolean](
       default = false,
       title = "Enable symbol highlights",
+      description = "⚠️ EXPERIMENTAL: not stable (may misbehave when editing sources)",
     )
   }
 
   val sbt = new SettingsGroup(Sbt, "sbt server integration")
   object Sbt extends ConfigSchema {
-    val enabled = new Setting[Boolean](
-      default = false,
-      title = "Use sbt server to run a command on file save and report diagnostics",
-      description = "⚠️ EXPERIMENTAL: requires sbt v1.1 (launch sbt manually and use _Sbt Connect_ command)",
-    )
+    val diagnostics = new SettingsGroup(Diagnostics, "Diagnostics on save")
+    object Diagnostics extends ConfigSchema {
+      val enabled = new Setting[Boolean](
+        default = true,
+        title = "Enable diagnostics from the sbt server",
+        description = "Requires sbt v1.1+ (launch it manually)",
+      )
+    }
     val command = new Setting[String](
-      default = "test:compile",
-      title = "Which sbt command to run on file save"
+      default = "",
+      title = "sbt command to run on file save"
     )
   }
 
   val scalac = new SettingsGroup(Scalac, "Presentation compiler")
   object Scalac extends ConfigSchema {
-
     val completions = new SettingsGroup(Completions, "Completions as you type")
     object Completions extends ConfigSchema {
       val enabled = new Setting[Boolean](
@@ -131,7 +131,6 @@ object MetalsConfig extends ConfigSchema {
         description = "⚠️ EXPERIMENTAL: not stable (use _Reset Presentation Compiler_ command when it stops working)",
       )
     }
-
     val diagnostics = new SettingsGroup(Diagnostics, "Diagnostics as you type")
     object Diagnostics extends ConfigSchema {
       val enabled = new Setting[Boolean](
@@ -150,8 +149,7 @@ object MetalsConfig extends ConfigSchema {
     )
     val confPath = new Setting[String](
       default = ".scalafix.conf",
-      title =
-        "Path to the Scalafix configuration, relative to the workspace path"
+      title = "Path to the Scalafix configuration, relative to the workspace path"
     )
   }
 
@@ -163,12 +161,12 @@ object MetalsConfig extends ConfigSchema {
     )
     val onSave = new Setting[Boolean](
       default = false,
-      title = "Format file before saving it"
+      title = "Format file before saving it",
+      description = "⚠️ EXPERIMENTAL: Atom feature in development",
     )
     val version = new Setting[String](
       default = "1.4.0",
-      title =
-        "Version of Scalafmt to use"
+      title = "Version of Scalafmt to use"
     )
     val confPath = new Setting[String](
       default = ".scalafmt.conf",
