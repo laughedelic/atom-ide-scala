@@ -7,7 +7,7 @@
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)](https://gitter.im/laughedelic/atom-ide-scala)
 
-Scala language support for [Atom IDE], powered by [Metals] :metal:
+Scala/Dotty language support for [Atom IDE], powered by [Metals] :metal: and [Dotty language server]
 
 ![](https://user-images.githubusercontent.com/766656/34135911-aa78092a-e463-11e7-9fdf-710a8deb4093.png)
 
@@ -65,9 +65,19 @@ On the first launch it will automatically install its dependencies if needed:
 
 ## Usage
 
+### Metals
+
 1. Follow Metals [installation instructions](https://github.com/scalameta/metals/blob/master/docs/installation.md) to prepare your Scala projects.
-2. Open a project in Atom. Once you open a Scala file, server will get launched and you will see a progress indicator in the status bar.
-3. Notice that when you close all tabs with Scala files, language server will be stopped. See [atom-languageclient#141](https://github.com/atom/atom-languageclient/issues/141) for discussion on this behavior.
+1. Open a project in Atom. Once you open a Scala file, server will get launched and you will see a progress indicator in the status bar.
+1. Notice that when you close all tabs with Scala files, language server will be stopped. See [atom-languageclient#141](https://github.com/atom/atom-languageclient/issues/141) for discussion on this behavior.
+
+### Dotty (experimental)
+
+1. Setup a [Dotty sbt project](https://github.com/lampepfl/dotty-example-project) and run `sbt configureIDE` in it
+1. Change language server in the plugin settings to Dotty _and reload_
+1. Open any file in the project and the server will launch
+
+Official instructions may tell you to run `launchIDE` in sbt, but this command can only launch VS Code, so just use `configureIDE` instead and open the project in Atom.
 
 
 [Scala]: http://scala-lang.org/
@@ -75,3 +85,4 @@ On the first launch it will automatically install its dependencies if needed:
 [Atom IDE]: https://ide.atom.io/
 [Metals]: https://github.com/scalameta/metals
 [LSP]: https://github.com/Microsoft/language-server-protocol
+[Dotty language server]: http://dotty.epfl.ch/docs/usage/ide-support.html
