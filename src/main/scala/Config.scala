@@ -84,12 +84,6 @@ object JavaConfig extends ConfigSchema {
       "-XX:+UseStringDeduplication",
     )
   )
-
-  val home = new Setting[String](
-    title = "Java Home",
-    description = "Plugin will try to guess your Java Home path, but if you have a very specific setup you can use this option to set it explicitly",
-    default = "",
-  )
 }
 
 object MetalsConfig extends ConfigSchema {

@@ -5,14 +5,12 @@ import scala.scalajs.js, js.annotation._, js.Dynamic.global
 import laughedelic.atom.Atom
 
 sealed trait ServerType {
-
   val name: String
   val description: String
   val defaultVersion: String
 
   def javaArgs(projectPath: String): Seq[String]
-  def coursierArgs(javaHome: String, version: String): Seq[String]
-
+  def coursierArgs(version: String): Seq[String]
   def watchFilter(filePath: String): Boolean
 }
 
@@ -25,7 +23,7 @@ case object ServerType {
 
     def javaArgs(projectPath: String): Seq[String] = Seq()
 
-    def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = Seq(
+    def coursierArgs(version: String): Seq[String] = Seq(
       "--repository", "bintray:scalameta/maven",
       s"org.scalameta:metals_2.12:${version}",
       "--main", "scala.meta.metals.Main"
@@ -52,10 +50,8 @@ case object ServerType {
       s"-Dlsp.logLevel=DEBUG",
     )
 
-    def coursierArgs(javaHome: String, version: String = defaultVersion): Seq[String] = {
-      val toolsJar = Path.join(javaHome, "lib", "tools.jar")
+    def coursierArgs(version: String): Seq[String] = {
       Seq(
-        "--extra-jars", toolsJar,
         "--repository", "bintray:dhpcs/maven",
         "--repository", "sonatype:snapshots",
         s"org.ensime:server_2.12:${version}",
@@ -72,8 +68,7 @@ case object ServerType {
 
   def fromName(name: String): Option[ServerType] =
     name match {
-      case "scalameta" => Some(Metals)
-      case Metals.name => Some(Metals)
+      case Metals.name | "scalameta" => Some(Metals)
       case Ensime.name => Some(Ensime)
       case _ => None
     }
