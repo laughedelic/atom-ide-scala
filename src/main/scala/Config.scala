@@ -9,6 +9,7 @@ object Config extends ConfigSchema {
 
   val serverType = new Setting[String](
     title = "Language Server",
+    description = "Changing this setting requires reload of the plugin",
     default = ServerType.Metals.name,
     enum = ServerType.values.map { st =>
       new AllowedValue(st.name, st.description)

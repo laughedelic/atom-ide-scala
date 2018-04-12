@@ -68,7 +68,7 @@ case object ServerType {
 
   case object Dotty extends ServerType {
     val name: String = "Dotty"
-    val description: String = "Dotty (experimental)"
+    val description: String = "Dotty language server (experimental)"
     val defaultVersion: String = "0.7.0-RC1"
 
     def javaArgs(projectPath: String): Seq[String] = Seq()
