@@ -5,9 +5,15 @@ import laughedelic.atom.config._
 
 object Config extends ConfigSchema {
 
-  val serverType = new Setting[String](
-    title = "Language Server",
-    description = "Changing this setting requires reload of the plugin",
+  val autoServer = new Setting[Boolean](
+    title = "Choose server based on the project setup",
+    description = "Read the usage section below to learn how to setup projects",
+    default = true,
+  )
+
+  val defaultServer = new Setting[String](
+    title = "Default language server",
+    description = "This server will be used when project setup is ambiguous or the above option is off",
     default = Metals.name,
     enum = ScalaLanguageServer.values.map { st =>
       new AllowedValue(st.name, st.description)
@@ -15,23 +21,23 @@ object Config extends ConfigSchema {
   )
 
   val serverVersion = new Setting[String](
-    title = "Language Server Version",
+    title = "Language server version",
     default = Metals.defaultVersion,
   )
 
-  val metals = new SettingsGroup(MetalsConfig,
-    title = "Metals Configuration",
+  val java = new SettingsGroup(JavaConfig,
+    title = "Java configuration",
     collapsed = true,
   )
 
-  val java = new SettingsGroup(JavaConfig,
-    title = "Java Configuration",
+  val metals = new SettingsGroup(MetalsConfig,
+    title = "Metals configuration",
     collapsed = true,
   )
 
   override def postInit(): Unit = {
     // This toggles server version depending on the chosen server type
-    serverType.onDidChange({ change: SettingChange[String] =>
+    defaultServer.onDidChange({ change: SettingChange[String] =>
       for {
         oldValue <- change.oldValue
         oldST <- ScalaLanguageServer.fromName(oldValue)

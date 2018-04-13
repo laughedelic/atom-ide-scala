@@ -36,7 +36,7 @@ trait ScalaLanguageServer {
   val commands: Map[String, ActiveServer => js.Any => Any]
 }
 
-case object ScalaLanguageServer {
+object ScalaLanguageServer {
 
   def fromName(name: String): Option[ScalaLanguageServer] =
     name match {
@@ -46,9 +46,22 @@ case object ScalaLanguageServer {
       case _ => None
     }
 
-  // NOTE: config won't contain an ivalid value, so no Option here
+  // NOTE: Once initialized, config won't contain an invalid value, so no Option here
   def fromConfig: ScalaLanguageServer =
-    fromName(Config.serverType.get).get
+    fromName(Config.defaultServer.get).get
 
-  val values = Seq(Metals, Dotty)
+  val values = Seq(Metals, Dotty, Ensime)
+
+  // An empty server which can be used to initialize the client, before the
+  // config is accessible or projet setup can be determined
+  object dummy extends ScalaLanguageServer {
+    val name: String = ""
+    val description: String = "Scala Language Server"
+    val defaultVersion: String = ""
+    def trigger(projectPath: String): Boolean = false
+    def watchFilter(filePath: String): Boolean = false
+    def coursierArgs(projectPath: String): Seq[String] = Seq()
+    val commands = Map()
+    // override def launch(projectPath: String): ChildProcess = ???
+  }
 }

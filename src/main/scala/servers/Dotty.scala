@@ -3,7 +3,7 @@ package laughedelic.atom.ide.scala
 import scala.util.Try
 
 object Dotty extends ScalaLanguageServer {
-  val name: String = "Dotty"
+  val name: String = "dotty"
   val description: String = "Dotty language server (experimental)"
   val defaultVersion: String = "0.7.0-RC1"
 

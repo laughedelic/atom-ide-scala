@@ -6,7 +6,7 @@ import laughedelic.atom.config._
 import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
 
 object Metals extends ScalaLanguageServer { server =>
-  val name: String = "Metals"
+  val name: String = "metals"
   val description: String = "Metals (Scalameta language server)"
   val defaultVersion: String = "e1b3a1fa"
 

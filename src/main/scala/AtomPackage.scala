@@ -17,12 +17,11 @@ object AtomPackage {
   //////////////////////////////////////////////////////////////////////////////
   // This is pure boilerplate. We need it because we can't simply say
   // `module.exports = new ScalaLanguageClient();`
-
-  private val client = new ScalaLanguageClient()
-
   @JSExportTopLevel("config")
   val config = Config.init(AtomPackage.name)
-  // client.getLogger().debug(js.JSON.stringify(config, space = 2))
+  // println(js.JSON.stringify(config, space = 2))
+
+  private val client = new ScalaLanguageClient()
 
   @JSExportTopLevel("activate")
   def activate(): Unit = {

@@ -1,7 +1,7 @@
 package laughedelic.atom.ide.scala
 
 object Ensime extends ScalaLanguageServer {
-  val name: String = "Ensime"
+  val name: String = "ensime"
   val description: String = "ENSIME (experimental)"
   val defaultVersion: String = "3.0.0-SNAPSHOT"
 
