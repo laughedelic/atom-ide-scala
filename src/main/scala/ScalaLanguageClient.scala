@@ -1,8 +1,7 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js, js.|, js.JSConverters._
-import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
-import io.scalajs.nodejs.path.Path
+import scala.scalajs.js, js.|
+import io.scalajs.nodejs.child_process.ChildProcess
 import laughedelic.atom.{ Atom, TextEditor }
 import laughedelic.atom.languageclient._
 
@@ -24,22 +23,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def startServerProcess(
     projectPath: String
   ): ChildProcess | js.Promise[ChildProcess] = {
-    val coursierJar = Path.join(AtomPackage.path, "coursier")
-    val javaArgs =
-      server.javaArgs(projectPath) ++
-      Config.java.extraArgs.get ++
-      Seq(
-        "-jar", coursierJar,
-        "launch", "--quiet"
-      ) ++
-      server.coursierArgs(Config.serverVersion.get)
-    println(javaArgs.mkString("\n"))
-    val serverProcess = ChildProcess.spawn(
-      "java", javaArgs.toJSArray,
-      new SpawnOptions(cwd = projectPath)
-    )
-    client.captureServerErrors(serverProcess)
-    serverProcess
+    server.launch(projectPath)
   }
 
   override def postInitialization(activeServer: ActiveServer): Unit = {

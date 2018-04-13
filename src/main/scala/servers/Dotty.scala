@@ -1,19 +1,27 @@
 package laughedelic.atom.ide.scala
 
+import scala.util.Try
+
 object Dotty extends ScalaLanguageServer {
   val name: String = "Dotty"
   val description: String = "Dotty language server (experimental)"
   val defaultVersion: String = "0.7.0-RC1"
 
-  def javaArgs(projectPath: String): Seq[String] = Seq()
+  private val artifactFile = ".dotty-ide-artifact"
 
-  def coursierArgs(version: String): Seq[String] = {
-    // FIXME: artifact should be read from the file, but it requires passing here projectPath
-    // For now artifact reference will be hardcoded
-    // import io.scalajs.nodejs.fs.Fs
-    // val artifact = Fs.readFileSync(".dotty-ide-artifact").toString("utf-8").trim
+  def trigger(projectPath: String): Boolean = {
+    (projectPath / artifactFile).isFile
+    // or .dotty-ide.json?
+  }
+
+  def coursierArgs(projectPath: String): Seq[String] = {
+    val artifactRef = Try {
+      (projectPath / artifactFile).readSync().trim
+    } getOrElse {
+      s"ch.epfl.lamp:dotty-language-server_0.7:${Config.serverVersion.get}"
+    }
     Seq(
-      s"ch.epfl.lamp:dotty-language-server_0.7:${version}",
+      artifactRef,
       "--main", "dotty.tools.languageserver.Main",
       "--", "-stdio"
     )

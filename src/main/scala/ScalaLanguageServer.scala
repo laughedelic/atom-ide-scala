@@ -1,18 +1,36 @@
 package laughedelic.atom.ide.scala
 
-import io.scalajs.nodejs.path.Path
-import scala.scalajs.js, js.annotation._, js.Dynamic.global
-import laughedelic.atom.Atom
-import laughedelic.atom.config._
+import scala.scalajs.js, js.JSConverters._
+import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
 
 trait ScalaLanguageServer {
   val name: String
   val description: String
   val defaultVersion: String
 
-  def javaArgs(projectPath: String): Seq[String]
-  def coursierArgs(version: String): Seq[String]
+  def version: String = Config.serverVersion.get
+
+  def trigger(projectPath: String): Boolean
   def watchFilter(filePath: String): Boolean
+
+  def coursierArgs(projectPath: String): Seq[String]
+
+  def javaExtraArgs(projectPath: String): Seq[String] =
+    Config.java.extraArgs.get.toSeq
+
+  def launch(projectPath: String): ChildProcess = {
+    val javaArgs: Seq[String] = Seq(
+      javaExtraArgs(projectPath),
+      Seq("-jar", AtomPackage.coursier, "launch", "--quiet"),
+      coursierArgs(projectPath),
+    ).flatten
+    // println(javaArgs.mkString("\n"))
+
+    ChildProcess.spawn(
+      "java", javaArgs.toJSArray,
+      new SpawnOptions(cwd = projectPath)
+    )
+  }
 }
 
 case object ScalaLanguageServer {

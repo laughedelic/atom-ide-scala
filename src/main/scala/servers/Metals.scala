@@ -4,24 +4,26 @@ import scala.scalajs.js
 import laughedelic.atom.{ Atom, NotificationOptions }
 import laughedelic.atom.config._
 
-object Metals extends ScalaLanguageServer {
+object Metals extends ScalaLanguageServer { server =>
   val name: String = "Metals"
   val description: String = "Metals (Scalameta language server)"
   val defaultVersion: String = "e1b3a1fa"
 
-  def javaArgs(projectPath: String): Seq[String] = Seq()
-
-  def coursierArgs(version: String): Seq[String] = Seq(
-    "--repository", "bintray:scalameta/maven",
-    s"org.scalameta:metals_2.12:${version}",
-    "--main", "scala.meta.metals.Main"
-  )
+  def trigger(projectPath: String): Boolean = {
+    (projectPath / ".metals").isDirectory
+  }
 
   def watchFilter(filePath: String): Boolean = {
     filePath.endsWith(".semanticdb") ||
     filePath.endsWith(".properties") ||
     filePath.endsWith("active.json")
   }
+
+  def coursierArgs(projectPath: String): Seq[String] = Seq(
+    "--repository", "bintray:scalameta/maven",
+    s"org.scalameta:metals_2.12:${Config.serverVersion.get}",
+    "--main", "scala.meta.metals.Main"
+  )
 }
 
 object MetalsConfig extends ConfigSchema {

@@ -12,6 +12,8 @@ object AtomPackage {
     .getLoadedPackage(AtomPackage.name)
     .path.asInstanceOf[String]
 
+  val coursier: String = AtomPackage.path / "coursier"
+
   //////////////////////////////////////////////////////////////////////////////
   // This is pure boilerplate. We need it because we can't simply say
   // `module.exports = new ScalaLanguageClient();`
@@ -19,12 +21,12 @@ object AtomPackage {
   private val client = new ScalaLanguageClient()
 
   @JSExportTopLevel("config")
-  val config = Config.init("ide-scala")
+  val config = Config.init(AtomPackage.name)
   // client.getLogger().debug(js.JSON.stringify(config, space = 2))
 
   @JSExportTopLevel("activate")
   def activate(): Unit = {
-    packageDeps.install("ide-scala", showPrompt = false)
+    packageDeps.install(AtomPackage.name, showPrompt = false)
     client.activate()
   }
   @JSExportTopLevel("deactivate")
