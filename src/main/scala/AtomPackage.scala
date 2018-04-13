@@ -1,16 +1,26 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js, js.annotation._
+import scala.scalajs.js, js.annotation._, js.Dynamic.global
 import laughedelic.atom.ide.ui.busysignal.BusySignalService
 import laughedelic.atom.packagedeps.packageDeps
 
-// NOTE: This is pure boilerplate. We need it because we can"t simply say `module.exports = new ScalaLanguageClient();`
-object Exports {
+object AtomPackage {
+
+  val name: String = "ide-scala"
+
+  val path: String = global.atom.packages
+    .getLoadedPackage(AtomPackage.name)
+    .path.asInstanceOf[String]
+
+  //////////////////////////////////////////////////////////////////////////////
+  // This is pure boilerplate. We need it because we can't simply say
+  // `module.exports = new ScalaLanguageClient();`
+
   private val client = new ScalaLanguageClient()
 
   @JSExportTopLevel("config")
   val config = Config.init("ide-scala")
-  client.getLogger().debug(js.JSON.stringify(config, space = 2))
+  // client.getLogger().debug(js.JSON.stringify(config, space = 2))
 
   @JSExportTopLevel("activate")
   def activate(): Unit = {

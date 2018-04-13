@@ -1,19 +1,15 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js, js.|, js.Dynamic.global, js.annotation._, js.JSConverters._
-import scala.concurrent.{ Future, ExecutionContext }
+import scala.scalajs.js, js.|, js.JSConverters._
 import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
 import io.scalajs.nodejs.path.Path
-import io.scalajs.nodejs.os.OS
-import io.scalajs.nodejs.fs.Fs
-import laughedelic.atom.{ Atom, NotificationOptions, TextEditor }
+import laughedelic.atom.{ Atom, TextEditor }
 import laughedelic.atom.languageclient._
-import laughedelic.atom.ide.ui.busysignal._
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
   import ScalaLanguageClient._
 
-  private lazy val server: ServerType = ServerType.fromConfig
+  private lazy val server: ScalaLanguageServer = ScalaLanguageServer.fromConfig
   private lazy val serverID: String = server.name.toLowerCase
 
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
@@ -28,10 +24,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def startServerProcess(
     projectPath: String
   ): ChildProcess | js.Promise[ChildProcess] = {
-    val packagePath = global.atom.packages
-      .getLoadedPackage("ide-scala")
-      .path.asInstanceOf[String]
-    val coursierJar = Path.join(packagePath, "coursier")
+    val coursierJar = Path.join(AtomPackage.path, "coursier")
     val javaArgs =
       server.javaArgs(projectPath) ++
       Config.java.extraArgs.get ++
