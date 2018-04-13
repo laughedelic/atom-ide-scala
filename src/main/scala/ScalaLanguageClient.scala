@@ -6,7 +6,6 @@ import laughedelic.atom.{ Atom, TextEditor }
 import laughedelic.atom.languageclient._
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
-  import ScalaLanguageClient._
 
   private lazy val server: ScalaLanguageServer = ScalaLanguageServer.fromConfig
   private lazy val serverID: String = server.name.toLowerCase
@@ -26,23 +25,25 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     server.launch(projectPath)
   }
 
+  private def camelToKebab(str: String) =
+    "[A-Z]".r.replaceAllIn(str, { "-" + _.group(0).toLowerCase() })
+
   override def postInitialization(activeServer: ActiveServer): Unit = {
-    val serverSupportedCommands = activeServer
+    activeServer
       .capabilities
       .executeCommandProvider
-      .map(_.commands.toSet)
-      .getOrElse(Set.empty)
-    val commands = supportedCommands.intersect(serverSupportedCommands)
-    commands.foreach { cmd =>
-      Atom.commands.add(
-        "atom-text-editor",
-        s"${serverID}:${toAtomCommand(cmd)}",
-        { _ =>
-          activeServer.connection.executeCommand(
-            new ExecuteCommandParams(command = cmd)
+      .map(_.commands).getOrElse(js.Array())
+      .foreach { cmd =>
+        server.commands.get(cmd).foreach { handler =>
+          Atom.commands.add(
+            "atom-text-editor",
+            s"${serverID}:${camelToKebab(cmd)}",
+            { node =>
+              handler(activeServer)(node)
+            }: js.Function1[js.Any, Unit]
           )
-        }: js.Function1[Any, Unit])
-    }
+        }
+      }
   }
 
   override def getRootConfigurationKey(): String =
@@ -53,16 +54,4 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     js.Dynamic.literal(
       serverID -> configuration
     )
-}
-
-object ScalaLanguageClient {
-  val supportedCommands = Set(
-    "clearIndexCache",
-    "resetPresentationCompiler",
-    "sbtConnect",
-    // "scalafixUnusedImports",
-  )
-
-  // Transform from camelCase to camel-case
-  val toAtomCommand = "[A-Z]".r.replaceAllIn(_: String, { "-" + _.group(0).toLowerCase() })
 }

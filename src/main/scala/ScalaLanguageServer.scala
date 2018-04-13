@@ -2,6 +2,7 @@ package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.JSConverters._
 import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
+import laughedelic.atom.languageclient.ActiveServer
 
 trait ScalaLanguageServer {
   val name: String
@@ -31,6 +32,8 @@ trait ScalaLanguageServer {
       new SpawnOptions(cwd = projectPath)
     )
   }
+
+  val commands: Map[String, ActiveServer => js.Any => Any]
 }
 
 case object ScalaLanguageServer {

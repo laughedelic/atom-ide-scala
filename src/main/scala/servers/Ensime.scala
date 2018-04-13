@@ -32,4 +32,6 @@ object Ensime extends ScalaLanguageServer {
     "--main", "org.ensime.server.Server",
     "--", "--lsp"
   )
+
+  val commands = Map()
 }

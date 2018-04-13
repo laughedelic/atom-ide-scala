@@ -3,6 +3,7 @@ package laughedelic.atom.ide.scala
 import scala.scalajs.js
 import laughedelic.atom.{ Atom, NotificationOptions }
 import laughedelic.atom.config._
+import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
 
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "Metals"
@@ -24,6 +25,19 @@ object Metals extends ScalaLanguageServer { server =>
     s"org.scalameta:metals_2.12:${Config.serverVersion.get}",
     "--main", "scala.meta.metals.Main"
   )
+
+  val commands = Seq(
+    "clearIndexCache",
+    "resetPresentationCompiler",
+    "sbtConnect",
+    // "scalafixUnusedImports",
+  ).map { cmd =>
+    cmd -> { activeServer: ActiveServer => _: js.Any =>
+      activeServer.connection.executeCommand(
+        new ExecuteCommandParams(command = cmd)
+      )
+    }
+  }.toMap
 }
 
 object MetalsConfig extends ConfigSchema {

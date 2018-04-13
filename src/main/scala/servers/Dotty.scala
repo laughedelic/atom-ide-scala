@@ -14,6 +14,8 @@ object Dotty extends ScalaLanguageServer {
     // or .dotty-ide.json?
   }
 
+  def watchFilter(filePath: String): Boolean = false
+
   def coursierArgs(projectPath: String): Seq[String] = {
     val artifactRef = Try {
       (projectPath / artifactFile).readSync().trim
@@ -27,5 +29,5 @@ object Dotty extends ScalaLanguageServer {
     )
   }
 
-  def watchFilter(filePath: String): Boolean = false
+  val commands = Map()
 }
