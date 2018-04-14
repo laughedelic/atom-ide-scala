@@ -24,8 +24,12 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       case None => {
         val default = ScalaLanguageServer.fromConfig
         Atom.notifications.addWarning(
-          s"This project is not setup, using default server: ${default.name.capitalize}",
-          new NotificationOptions(dismissable = false)
+          s"Project is not setup, using default language server: ${default.name.capitalize}",
+          new NotificationOptions(
+            detail = projectPath,
+            dismissable = false,
+            icon = "plug",
+          )
           // TODO: add buttons and let user choose
         )
         // Probably it's better to send user to the usage docs and not launch any
@@ -33,9 +37,14 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         server = default
       }
       case Some(newServer) => {
-        Atom.notifications.addInfo(
-          s"Looks like a ${newServer.name.capitalize} project, launching server",
-          new NotificationOptions(dismissable = false)
+        val a = if (newServer == Ensime) "an" else "a"
+        Atom.notifications.addSuccess(
+          s"Looks like ${a} **${newServer.name.capitalize}** project, launching language server...",
+          new NotificationOptions(
+            detail = projectPath,
+            dismissable = false,
+            icon = "rocket",
+          )
         )
         server = newServer
       }
