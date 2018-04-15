@@ -3,7 +3,7 @@ import org.scalajs.core.tools.linker.standard._
 
 name := "atom-ide-scala"
 organization := "laughedelic"
-description := "Scala language support for Atom-IDE"
+description := "Scala & Dotty language support for Atom IDE"
 
 homepage := Some(url(s"https://github.com/${organization.value}/${name.value}"))
 scmInfo in ThisBuild := Some(ScmInfo(
@@ -64,7 +64,8 @@ apmKeywords := Seq(
   "atom-ide",
   "lsp",
   "language-server",
-  "language-server-protocol"
+  "language-server-protocol",
+  "dotty"
 )
 
 apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
