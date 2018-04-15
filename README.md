@@ -19,7 +19,14 @@ This plugin is written in **[Scala.js]**, so if you are a Scala developer lookin
 
 The work of this plugin is to launch the language server and wire communication with it to the Atom IDE services. Most of the interesting stuff is happening on the server side, so check also the [scalameta/metals](https://github.com/scalameta/metals) project.
 
+During development some reusable parts were split into separate repos:
+
+* [scalajs-atom-api](https://github.com/laughedelic/scalajs-atom-api): Scala.js facades for Atom-related APIs (including atom-languageclient)
+* [sbt-atom-package](https://github.com/laughedelic/sbt-atom-package): an sbt plugin wraping apm and simplifying development of Scala.js-based Atom plugins
+
 ## Features
+
+> ⚠️ This list is outdated and refers only to Metals features. Check each supported server documentation to find out which features they support.
 
 Here is a list of the features which are implemented. It doesn't mean that they all work well, just that they are implemented on the server side and are supported by this plugin. Also notice that some features may take time to activate after you open a new file or change code.
 
@@ -65,20 +72,31 @@ On the first launch it will automatically install its dependencies if needed:
 
 ## Usage
 
+This plugin can work with different Scala language servers. You can use it for Scala-2.12 Metals projects as well as for the Dotty projects.
+
+In any case it is expected that you first follow the corresponding language server setup instructions to prepare your project. Usually it involves installing an sbt plugin and running some setup command for every new project. The Atom plugin will check the project setup and choose the right server automatically. This is configurable:
+
+* you can select a default server which will be used for all new projects (you're still expected to setup your projects manually until servers can do it on their own)
+* you can turn off automatic server choice if you always want to use same server
+
+Plugin gets activated only when you open a `.scala` file.
+
+> ⚠️ Notice that when you close all tabs with Scala files, language server will be stopped. See [atom-languageclient#141](https://github.com/atom/atom-languageclient/issues/141) for discussion on this behavior.
+
 ### Metals
 
 1. Follow Metals [installation instructions](https://github.com/scalameta/metals/blob/master/docs/installation.md) to prepare your Scala projects.
-1. Open a project in Atom. Once you open a Scala file, server will get launched and you will see a progress indicator in the status bar.
-1. Notice that when you close all tabs with Scala files, language server will be stopped. See [atom-languageclient#141](https://github.com/atom/atom-languageclient/issues/141) for discussion on this behavior.
+1. Open a project in Atom. Once you open a Scala file, you will see the server launching.
 
-### Dotty (experimental)
+### Dotty
 
-1. Setup a [Dotty sbt project](https://github.com/lampepfl/dotty-example-project) and run `sbt configureIDE` in it
-1. Change language server in the plugin settings to Dotty _and reload_
-1. Open any file in the project and the server will launch
+1. Setup a [Dotty sbt project](https://github.com/lampepfl/dotty-example-project) and run `sbt configureIDE` in it.  
+    Official instructions may tell you to run `launchIDE` in sbt, but this command can only launch VS Code, so just use `configureIDE` instead and open the project in Atom.
+1. Open a project in Atom. Once you open a Scala file, you will see the server launching.
 
-Official instructions may tell you to run `launchIDE` in sbt, but this command can only launch VS Code, so just use `configureIDE` instead and open the project in Atom.
+### Ensime
 
+There is [Ensime LSP](https://github.com/ensime/ensime-server/issues/1918) support in development. See [#13](https://github.com/laughedelic/atom-ide-scala/issues/13) for details if you're interested in contributing.
 
 [Scala]: http://scala-lang.org/
 [Scala.js]: https://www.scala-js.org/
