@@ -24,11 +24,24 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       else Nil
 
     triggerred match {
+      case Nil if !Config.autoServer.get && !ScalaLanguageServer.defaultNonEmpty => {
+        Atom.notifications.addError(
+          "No Scala language server is selected",
+          new NotificationOptions(
+            description = "Automatic server selection is off and no default is chosen. Go to the [ide-scala settings](atom://settings-view/show-package?package=ide-scala) to fix it.",
+            detail = projectPath,
+            dismissable = true,
+            icon = "mute",
+          )
+        )
+        Future(ScalaLanguageServer.none)
+      }
+
       case Nil => {
         val default = ScalaLanguageServer.fromConfig
         val title = "Project is not setup" ++ {
           if (default == ScalaLanguageServer.none) " for any Scala language server"
-          else s", using default language server: ${default.name.capitalize}"
+          else s", using default language server: **${default.name.capitalize}**"
         }
         Atom.notifications.addWarning(
           title,
