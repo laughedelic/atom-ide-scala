@@ -26,7 +26,7 @@ During development some reusable parts were split into separate repos:
 
 ## Features
 
-> ⚠️ This list is outdated and refers only to Metals features. Check each supported server documentation to find out which features they support.
+<details><summary> ⚠️ This list is outdated and refers only to the Metals features. Check each supported server documentation to find out which features they support.</summary>
 
 Here is a list of the features which are implemented. It doesn't mean that they all work well, just that they are implemented on the server side and are supported by this plugin. Also notice that some features may take time to activate after you open a new file or change code.
 
@@ -57,6 +57,8 @@ Here is a list of the features which are implemented. It doesn't mean that they 
 See also default [Atom IDE keybindings](https://github.com/facebook-atom/atom-ide-ui/blob/master/docs/keybindings.md).
 
 For the full list of implemented and planned features see the [overview](https://github.com/scalameta/metals/blob/master/docs/overview.md) of the Metals project.
+
+</details>
 
 ## Installation
 
