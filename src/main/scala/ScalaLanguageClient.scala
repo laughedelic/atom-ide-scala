@@ -1,9 +1,10 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js, js.|
+import scala.scalajs.js, js.|, js.JSConverters._
 import io.scalajs.nodejs.child_process.ChildProcess
-import laughedelic.atom.{ Atom, TextEditor, NotificationOptions }
+import laughedelic.atom._
 import laughedelic.atom.languageclient._
+import scala.concurrent._, ExecutionContext.Implicits.global
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
   // Constant values common for all servers
@@ -15,13 +16,13 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   // The rest depends on the chosen server
   private var server: ScalaLanguageServer = ScalaLanguageServer.dummy
 
-  private def setServer(projectPath: String) = {
-    Seq(
+  private def chooseServer(projectPath: String): Future[ScalaLanguageServer] = {
+    List(
       Dotty,
       Metals,
       Ensime,
-    ).find { _.trigger(projectPath) } match {
-      case None => {
+    ).filter { _.trigger(projectPath) } match {
+      case Nil => {
         val default = ScalaLanguageServer.fromConfig
         Atom.notifications.addWarning(
           s"Project is not setup, using default language server: ${default.name.capitalize}",
@@ -30,13 +31,12 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
             dismissable = false,
             icon = "plug",
           )
-          // TODO: add buttons and let user choose
         )
         // Probably it's better to send user to the usage docs and not launch any
         // server if project is not setup
-        server = default
+        Future(default)
       }
-      case Some(newServer) => {
+      case List(newServer) => {
         val a = if (newServer == Ensime) "an" else "a"
         Atom.notifications.addSuccess(
           s"Looks like ${a} **${newServer.name.capitalize}** project, launching language server...",
@@ -46,12 +46,39 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
             icon = "rocket",
           )
         )
-        server = newServer
+        Future(newServer)
+      }
+      case multipleMatch => {
+        val promise = Promise[ScalaLanguageServer]()
+        val notification = Atom.notifications.addInfo(
+          s"Ambiguous project setup",
+          new NotificationOptions(
+            description = s"Looks like this project is setup for several language servers, choose which one you want to launch:",
+            detail = projectPath,
+            dismissable = true,
+            icon = "law",
+            buttons = multipleMatch.toJSArray.map { newServer =>
+              new NotificationButton(
+                text = newServer.name.capitalize,
+                onDidClick = { _ =>
+                  promise.success(newServer)
+                }: js.Function1[Unit, Unit]
+              )
+            },
+          )
+        )
+        // TODO: add onDidDismiss to the Notification type (scalajs-atom-api)
+        notification.asInstanceOf[js.Dynamic].onDidDismiss(
+          { _ =>
+            if (!promise.isCompleted)
+              promise.success(ScalaLanguageServer.fromConfig)
+          }: js.Function1[Unit, Unit]
+        )
+        promise.future.andThen {
+          case _ => notification.dismiss()
+        }
       }
     }
-    // `name` field is set early and then used in some UI elements (instead of
-    // `getServerName`), we can update it here to fix, for example, logger console
-    client.asInstanceOf[js.Dynamic].updateDynamic("name")(server.name.capitalize)
   }
 
   override def getServerName(): String =
@@ -63,8 +90,16 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def startServerProcess(
     projectPath: String
   ): ChildProcess | js.Promise[ChildProcess] = {
-    if (Config.autoServer.get) setServer(projectPath)
-    server.launch(projectPath)
+    if (Config.autoServer.get) {
+      chooseServer(projectPath).map { chosen =>
+        server = chosen
+        // `name` field is set early and then used in some UI elements (instead of
+        // `getServerName`), we can update it here to fix, for example, logger console
+        client.asInstanceOf[js.Dynamic]
+          .updateDynamic("name")(chosen.name.capitalize)
+        chosen.launch(projectPath)
+      }.toJSPromise
+    } else server.launch(projectPath)
   }
 
   private def camelToKebab(str: String) =
