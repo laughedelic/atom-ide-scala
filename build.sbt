@@ -31,6 +31,7 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-deprecation",
   "-Yrangepos",
+  "-Ywarn-unused-import",
   "-P:scalajs:sjsDefinedByDefault"
 )
 
@@ -41,7 +42,7 @@ resolvers += Resolver.bintrayRepo("laughedelic", "maven")
 
 libraryDependencies ++= Seq(
   "io.scalajs" %%% "nodejs" % "0.4.2",
-  "laughedelic" %%% "scalajs-atom-api" % "0.6.0+5-c464d2a3",
+  "laughedelic" %%% "scalajs-atom-api" % "0.6.0+7-0c17704c",
 )
 
 lazy val getCoursier: Def.Initialize[Task[File]] = Def.task {
