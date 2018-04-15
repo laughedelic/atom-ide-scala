@@ -2,7 +2,7 @@ package laughedelic.atom.ide.scala
 
 object Ensime extends ScalaLanguageServer {
   val name: String = "ensime"
-  val description: String = "ENSIME (experimental)"
+  val description: String = "Ensime (broken!)"
   val defaultVersion: String = "3.0.0-SNAPSHOT"
 
   def trigger(projectPath: String): Boolean = {

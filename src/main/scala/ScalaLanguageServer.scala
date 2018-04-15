@@ -1,7 +1,7 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.JSConverters._
-import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
+import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions, ExecOptions }
 import laughedelic.atom.languageclient.ActiveServer
 
 trait ScalaLanguageServer {
@@ -46,22 +46,26 @@ object ScalaLanguageServer {
       case _ => None
     }
 
-  // NOTE: Once initialized, config won't contain an invalid value, so no Option here
   def fromConfig: ScalaLanguageServer =
-    fromName(Config.defaultServer.get).get
+    fromName(Config.defaultServer.get).getOrElse(none)
 
-  val values = Seq(Metals, Dotty, Ensime)
+  def defaultNonEmpty: Boolean =
+    fromName(Config.defaultServer.get).nonEmpty
+
+  val values = List(Metals, Dotty, Ensime)
 
   // An empty server which can be used to initialize the client, before the
   // config is accessible or projet setup can be determined
-  object dummy extends ScalaLanguageServer {
+  object none extends ScalaLanguageServer {
     val name: String = ""
-    val description: String = "Scala Language Server"
+    val description: String = "none"
     val defaultVersion: String = ""
     def trigger(projectPath: String): Boolean = false
     def watchFilter(filePath: String): Boolean = false
     def coursierArgs(projectPath: String): Seq[String] = Seq()
     val commands = Map()
+
+    // FIXME: should do exactly nothing
     // override def launch(projectPath: String): ChildProcess = ???
   }
 }

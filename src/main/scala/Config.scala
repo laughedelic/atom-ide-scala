@@ -14,15 +14,18 @@ object Config extends ConfigSchema {
   val defaultServer = new Setting[String](
     title = "Default language server",
     description = "This server will be used when project setup is ambiguous or the above option is off",
-    default = Metals.name,
-    enum = ScalaLanguageServer.values.map { st =>
-      new AllowedValue(st.name, st.description)
-    }.toJSArray,
+    default = ScalaLanguageServer.none.name,
+    enum = (
+        ScalaLanguageServer.none +:
+        ScalaLanguageServer.values
+      ).map { s =>
+        new AllowedValue(s.name, s.description)
+      }.toJSArray,
   )
 
   val serverVersion = new Setting[String](
     title = "Language server version",
-    default = Metals.defaultVersion,
+    default = ScalaLanguageServer.none.defaultVersion,
   )
 
   val java = new SettingsGroup(JavaConfig,

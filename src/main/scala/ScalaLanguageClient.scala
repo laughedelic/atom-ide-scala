@@ -12,30 +12,36 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def getLanguageName(): String = "Scala"
   override def shouldStartForEditor(editor: TextEditor): Boolean =
     editor.getURI.map(_.endsWith(".scala")).getOrElse(false)
+    // && (Config.autoServer.get || ScalaLanguageServer.defaultNonEmpty)
 
   // The rest depends on the chosen server
-  private var server: ScalaLanguageServer = ScalaLanguageServer.dummy
+  private var server: ScalaLanguageServer = ScalaLanguageServer.fromConfig
 
   private def chooseServer(projectPath: String): Future[ScalaLanguageServer] = {
-    List(
-      Dotty,
-      Metals,
-      Ensime,
-    ).filter { _.trigger(projectPath) } match {
+    val triggerred =
+      if (Config.autoServer.get)
+        ScalaLanguageServer.values.filter { _.trigger(projectPath) }
+      else Nil
+
+    triggerred match {
       case Nil => {
         val default = ScalaLanguageServer.fromConfig
+        val title = "Project is not setup" ++ {
+          if (default == ScalaLanguageServer.none) " for any Scala language server"
+          else s", using default language server: ${default.name.capitalize}"
+        }
         Atom.notifications.addWarning(
-          s"Project is not setup, using default language server: ${default.name.capitalize}",
+          title,
           new NotificationOptions(
+            description = "To learn how to setup new projects, follow the [documentation](https://github.com/laughedelic/atom-ide-scala#usage)",
             detail = projectPath,
-            dismissable = false,
+            dismissable = true,
             icon = "plug",
           )
         )
-        // Probably it's better to send user to the usage docs and not launch any
-        // server if project is not setup
         Future(default)
       }
+
       case List(newServer) => {
         val a = if (newServer == Ensime) "an" else "a"
         Atom.notifications.addSuccess(
@@ -48,6 +54,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         )
         Future(newServer)
       }
+
       case multipleMatch => {
         val promise = Promise[ScalaLanguageServer]()
         val notification = Atom.notifications.addInfo(
@@ -90,16 +97,17 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def startServerProcess(
     projectPath: String
   ): ChildProcess | js.Promise[ChildProcess] = {
-    if (Config.autoServer.get) {
-      chooseServer(projectPath).map { chosen =>
+    chooseServer(projectPath).map {
+      case ScalaLanguageServer.none =>
+        throw new RuntimeException("Couldn't start server: project is not setup and default server is not chosen")
+      case chosen =>
         server = chosen
         // `name` field is set early and then used in some UI elements (instead of
         // `getServerName`), we can update it here to fix, for example, logger console
         client.asInstanceOf[js.Dynamic]
           .updateDynamic("name")(chosen.name.capitalize)
         chosen.launch(projectPath)
-      }.toJSPromise
-    } else server.launch(projectPath)
+    }.toJSPromise
   }
 
   private def camelToKebab(str: String) =
