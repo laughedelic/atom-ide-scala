@@ -118,8 +118,8 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         // `name` field is set early and then used in some UI elements (instead of
         // `getServerName`), we can update it here to fix, for example, logger console
         client.asInstanceOf[js.Dynamic]
-          .updateDynamic("name")(chosen.name.capitalize)
-        chosen.launch(projectPath)
+          .updateDynamic("name")(server.name.capitalize)
+        server.launch(projectPath)
     }.toJSPromise
   }
 

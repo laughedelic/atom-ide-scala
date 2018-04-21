@@ -23,11 +23,6 @@ object Config extends ConfigSchema {
       }.toJSArray,
   )
 
-  val serverVersion = new Setting[String](
-    title = "Language server version",
-    default = ScalaLanguageServer.none.defaultVersion,
-  )
-
   val java = new SettingsGroup(JavaConfig,
     title = "Java configuration",
     collapsed = true,
@@ -38,19 +33,16 @@ object Config extends ConfigSchema {
     collapsed = true,
   )
 
-  override def postInit(): Unit = {
-    // This toggles server version depending on the chosen server type
-    defaultServer.onDidChange({ change: SettingChange[String] =>
-      for {
-        oldValue <- change.oldValue
-        oldST <- ScalaLanguageServer.fromName(oldValue)
-          // NOTE: if the version is changed, we don't want to overwrite it
-          if oldST.defaultVersion == Config.serverVersion.get
-        newST <- ScalaLanguageServer.fromName(change.newValue)
-      } yield
-        Config.serverVersion.set(newST.defaultVersion)
-    })
-  }
+  val dotty = new SettingsGroup(DottyConfig,
+    title = "Dotty configuration",
+    collapsed = true,
+  )
+
+  val ensime = new SettingsGroup(EnsimeConfig,
+    title = "Ensime configuration",
+    collapsed = true,
+  )
+
 }
 
 object JavaConfig extends ConfigSchema {

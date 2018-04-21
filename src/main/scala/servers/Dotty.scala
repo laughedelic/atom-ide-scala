@@ -1,5 +1,6 @@
 package laughedelic.atom.ide.scala
 
+import laughedelic.atom.config._
 import scala.util.Try
 
 object Dotty extends ScalaLanguageServer {
@@ -20,7 +21,7 @@ object Dotty extends ScalaLanguageServer {
     val artifactRef = Try {
       (projectPath / artifactFile).readSync().trim
     } getOrElse {
-      s"ch.epfl.lamp:dotty-language-server_0.7:${Config.serverVersion.get}"
+      s"ch.epfl.lamp:dotty-language-server_0.7:${Config.dotty.version.get}"
     }
     Seq(
       artifactRef,
@@ -30,4 +31,13 @@ object Dotty extends ScalaLanguageServer {
   }
 
   val commands = Map()
+}
+
+object DottyConfig extends ConfigSchema {
+
+  val version = new Setting[String](
+    title = "Dotty version",
+    description = "This version will be used only if `.dotty-ide-artifact` is missing",
+    default = Dotty.defaultVersion,
+  )
 }

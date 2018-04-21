@@ -1,15 +1,13 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.JSConverters._
-import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions, ExecOptions }
+import io.scalajs.nodejs.child_process.{ ChildProcess, SpawnOptions }
 import laughedelic.atom.languageclient.ActiveServer
 
 trait ScalaLanguageServer {
   val name: String
   val description: String
   val defaultVersion: String
-
-  def version: String = Config.serverVersion.get
 
   def trigger(projectPath: String): Boolean
   def watchFilter(filePath: String): Boolean
