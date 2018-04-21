@@ -1,5 +1,7 @@
 package laughedelic.atom.ide.scala
 
+import laughedelic.atom.config._
+
 object Ensime extends ScalaLanguageServer {
   val name: String = "ensime"
   val description: String = "Ensime (broken!)"
@@ -28,10 +30,18 @@ object Ensime extends ScalaLanguageServer {
   def coursierArgs(projectPath: String): Seq[String] = Seq(
     "--repository", "bintray:dhpcs/maven",
     "--repository", "sonatype:snapshots",
-    s"org.ensime:server_2.12:${Config.serverVersion.get}",
+    s"org.ensime:server_2.12:${Config.ensime.version.get}",
     "--main", "org.ensime.server.Server",
     "--", "--lsp"
   )
 
   val commands = Map()
+}
+
+object EnsimeConfig extends ConfigSchema {
+
+  val version = new Setting[String](
+    title = "Ensime version",
+    default = Ensime.defaultVersion,
+  )
 }

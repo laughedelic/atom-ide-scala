@@ -8,7 +8,7 @@ import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "e1b3a1fa"
+  val defaultVersion: String = "0.1.0-M1+90-fcac1cc3"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
@@ -22,7 +22,7 @@ object Metals extends ScalaLanguageServer { server =>
 
   def coursierArgs(projectPath: String): Seq[String] = Seq(
     "--repository", "bintray:scalameta/maven",
-    s"org.scalameta:metals_2.12:${Config.serverVersion.get}",
+    s"org.scalameta:metals_2.12:${Config.metals.version.get}",
     "--main", "scala.meta.metals.Main"
   )
 
@@ -41,6 +41,12 @@ object Metals extends ScalaLanguageServer { server =>
 }
 
 object MetalsConfig extends ConfigSchema {
+
+  val version = new Setting[String](
+    title = "Metals version",
+    description = "Set it to `SNAPSHOT` if you're working on Metals and publish it locally",
+    default = Metals.defaultVersion,
+  )
 
   val hover = new SettingsGroup(Hover, "Tooltips on hover")
   object Hover extends ConfigSchema {
