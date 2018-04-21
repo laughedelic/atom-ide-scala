@@ -134,7 +134,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       .foreach { cmd =>
         server.commands.get(cmd).foreach { handler =>
           Atom.commands.add(
-            "atom-text-editor",
+            "atom-workspace",
             s"${server.name}:${camelToKebab(cmd)}",
             { node =>
               handler(activeServer)(node)
@@ -142,6 +142,14 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
           )
         }
       }
+
+    Atom.commands.add(
+      "atom-workspace",
+      s"ide-scala:restart-all-language-servers",
+      { _ =>
+        client.restartAllServers()
+      }: js.Function1[js.Any, Unit]
+    )
   }
 
   override def getRootConfigurationKey(): String =
