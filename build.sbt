@@ -45,7 +45,8 @@ libraryDependencies ++= Seq(
   "laughedelic" %%% "scalajs-atom-api" % "0.6.0+7-0c17704c",
 )
 
-lazy val getCoursier: Def.Initialize[Task[File]] = Def.task {
+lazy val getCoursier = taskKey[File]("Get coursier binary if missing")
+getCoursier := {
   import sys.process._
   val log = streams.value.log
   val file = baseDirectory.value / "coursier"
