@@ -74,6 +74,7 @@ apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
 apmDependencies := Map(
   "atom-languageclient" -> "0.9.5",
   "atom-package-deps" -> "4.6.1",
+  "s-expression" -> "3.0.3",
 )
 
 apmConsumedServices := Map(
