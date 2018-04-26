@@ -45,6 +45,8 @@ libraryDependencies ++= Seq(
   "laughedelic" %%% "scalajs-atom-api" % "0.6.0+7-0c17704c",
 )
 
+scalaJSLinkerConfig ~= { _.withSourceMap(true) }
+
 lazy val getCoursier = taskKey[File]("Get coursier binary if missing")
 getCoursier := {
   import sys.process._
@@ -74,6 +76,7 @@ apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
 apmDependencies := Map(
   "atom-languageclient" -> "0.9.5",
   "atom-package-deps" -> "4.6.1",
+  "@atom/source-map-support" -> "0.3.4",
 )
 
 apmConsumedServices := Map(
