@@ -23,8 +23,6 @@ object Ensime extends ScalaLanguageServer {
     filePath.contains(".ensime")
   }
 
-  // override def javaExtraArgs(projectPath: String): Seq[String] = Seq()
-
   // coursier is not used for Ensime, because we get all information from the
   // .ensime file and use it to launch java process directly
   def coursierArgs(projectPath: String): Seq[String] = Seq()
@@ -42,25 +40,23 @@ object Ensime extends ScalaLanguageServer {
           description = s"Follow [documentation](http://ensime.github.io/build_tools) for your build tool to generate correct `.ensime` project file",
           detail = projectPath,
           dismissable = true,
-          // icon = "",
         )
       )
       throw new RuntimeException(message)
     }
-    val javaArgs: Seq[String] = Seq(
-      dotEnsime.javaFlags,
-      Seq(
+    val javaBin: String = dotEnsime.javaHome / "bin" / "java"
+    val javaArgs: Seq[String] =
+      dotEnsime.javaFlags ++ Seq(
         "-classpath", dotEnsime.classpath.mkString(Path.delimiter),
+        s"-Densime.config=${projectPath / ensimeFile}", // saw it somewhere, not sure it's needed
         s"-Dlsp.workspace=${projectPath}",
         s"-Dlsp.logLevel=${Config.ensime.logLevel.get}",
-      ),
-      // javaExtraArgs(projectPath),
-      Seq("org.ensime.server.Server", "--lsp")
-    ).flatten
+        "org.ensime.server.Server", "--lsp"
+      )
     println(javaArgs.mkString("\n"))
 
     ChildProcess.spawn(
-      "java", javaArgs.toJSArray,
+      javaBin, javaArgs.toJSArray,
       new SpawnOptions(cwd = projectPath)
     )
   }
@@ -85,6 +81,7 @@ case class DotEnsime(
   val scalaCompilerJars: Seq[String],
   val ensimeServerJars: Seq[String],
   val javaFlags: Seq[String],
+  val javaHome: String,
 ) {
   lazy val classpath: Seq[String] = scalaCompilerJars ++ ensimeServerJars
 }
@@ -97,6 +94,7 @@ object sExpressions {
   }
 
   def parse(text: String): Option[DotEnsime] = {
+    // It's parsed into a list of keys and values: (k1, v1, k2, v2, k3, v3, ...)
     val parsedMap = parseRaw(text)
       .asInstanceOf[js.Array[js.Any]].toSeq
       .sliding(2, 2)
@@ -105,11 +103,13 @@ object sExpressions {
     for {
       scj <- parsedMap.get(":scala-compiler-jars")
       esj <- parsedMap.get(":ensime-server-jars")
-      jfs <- parsedMap.get(":java-flags")
+      jf <- parsedMap.get(":java-flags")
+      jh <- parsedMap.get(":java-home")
     } yield DotEnsime(
       scalaCompilerJars = scj.asInstanceOf[js.Array[String]].toSeq,
       ensimeServerJars = esj.asInstanceOf[js.Array[String]].toSeq,
-      javaFlags = jfs.asInstanceOf[js.Array[String]].toSeq,
+      javaFlags = jf.asInstanceOf[js.Array[String]].toSeq,
+      javaHome = jh.asInstanceOf[String],
     )
   }
 }
