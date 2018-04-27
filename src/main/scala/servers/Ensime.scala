@@ -53,7 +53,7 @@ object Ensime extends ScalaLanguageServer {
         s"-Dlsp.logLevel=${Config.ensime.logLevel.get}",
         "org.ensime.server.Server", "--lsp"
       )
-    println(javaArgs.mkString("\n"))
+    println((javaBin +: javaArgs).mkString("\n"))
 
     ChildProcess.spawn(
       javaBin, javaArgs.toJSArray,
@@ -109,7 +109,9 @@ object sExpressions {
       scalaCompilerJars = scj.asInstanceOf[js.Array[String]].toSeq,
       ensimeServerJars = esj.asInstanceOf[js.Array[String]].toSeq,
       javaFlags = jf.asInstanceOf[js.Array[String]].toSeq,
-      javaHome = jh.asInstanceOf[String],
+      // NOTE: this is a bit tricky, because it's parse as a string object and
+      // we convert it to a string primitive (while for Scala it's all String)
+      javaHome = jh.asInstanceOf[js.Object].valueOf().toString(),
     )
   }
 }
