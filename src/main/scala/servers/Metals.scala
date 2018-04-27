@@ -20,6 +20,9 @@ object Metals extends ScalaLanguageServer { server =>
     filePath.endsWith("active.json")
   }
 
+  override def javaExtraArgs(projectPath: String): Seq[String] =
+    Config.metals.javaArgs.get.toSeq
+
   def coursierArgs(projectPath: String): Seq[String] = Seq(
     "--repository", "bintray:scalameta/maven",
     s"org.scalameta:metals_2.12:${Config.metals.version.get}",
@@ -42,12 +45,22 @@ object Metals extends ScalaLanguageServer { server =>
 
 object MetalsConfig extends ConfigSchema {
 
+  // These are custom settings for the Metals launcher
   val version = new Setting[String](
     title = "Metals version",
     description = "Set it to `SNAPSHOT` if you're working on Metals and publish it locally",
     default = Metals.defaultVersion,
   )
 
+  val javaArgs = new Setting[js.Array[String]](
+    title = "Extra JVM options",
+    default = js.Array(
+      "-XX:+UseG1GC",
+      "-XX:+UseStringDeduplication",
+    )
+  )
+
+  // The rest is the server configuration sent over to Metals
   val hover = new SettingsGroup(Hover, "Tooltips on hover")
   object Hover extends ConfigSchema {
     val enabled = new Setting[Boolean](

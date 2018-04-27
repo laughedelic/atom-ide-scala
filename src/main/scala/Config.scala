@@ -23,11 +23,6 @@ object Config extends ConfigSchema {
       }.toJSArray,
   )
 
-  val java = new SettingsGroup(JavaConfig,
-    title = "Java configuration",
-    collapsed = true,
-  )
-
   val metals = new SettingsGroup(MetalsConfig,
     title = "Metals configuration",
     collapsed = true,
@@ -43,14 +38,4 @@ object Config extends ConfigSchema {
     collapsed = true,
   )
 
-}
-
-object JavaConfig extends ConfigSchema {
-  val extraArgs = new Setting[js.Array[String]](
-    title = "Extra JVM options",
-    default = js.Array(
-      "-XX:+UseG1GC",
-      "-XX:+UseStringDeduplication",
-    )
-  )
 }

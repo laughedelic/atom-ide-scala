@@ -14,8 +14,7 @@ trait ScalaLanguageServer {
 
   def coursierArgs(projectPath: String): Seq[String]
 
-  def javaExtraArgs(projectPath: String): Seq[String] =
-    Config.java.extraArgs.get.toSeq
+  def javaExtraArgs(projectPath: String): Seq[String] = Seq()
 
   def launch(projectPath: String): ChildProcess = {
     val javaArgs: Seq[String] = Seq(
