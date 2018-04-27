@@ -4,6 +4,11 @@ import scala.scalajs.js, js.annotation._, js.Dynamic.global
 import laughedelic.atom.ide.ui.busysignal.BusySignalService
 import laughedelic.atom.packagedeps.packageDeps
 
+@js.native @JSImport("@atom/source-map-support", JSImport.Namespace)
+object sourceMapSupport extends js.Object {
+  def install(): js.Any = js.native
+}
+
 object AtomPackage {
 
   val name: String = "ide-scala"
@@ -25,6 +30,7 @@ object AtomPackage {
 
   @JSExportTopLevel("activate")
   def activate(): Unit = {
+    sourceMapSupport.install()
     packageDeps.install(AtomPackage.name, showPrompt = false)
     client.activate()
   }
