@@ -66,7 +66,9 @@ apmKeywords := Seq(
   "lsp",
   "language-server",
   "language-server-protocol",
-  "dotty"
+  "metals",
+  "dotty",
+  "ensime",
 )
 
 apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
