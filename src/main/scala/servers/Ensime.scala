@@ -70,11 +70,6 @@ object Ensime extends ScalaLanguageServer {
 
 object EnsimeConfig extends ConfigSchema {
 
-  val version = new Setting[String](
-    title = "Ensime version",
-    default = Ensime.defaultVersion,
-  )
-
   val logLevel = new Setting[String](
     title = "Logging verbosity",
     default = "DEBUG",
