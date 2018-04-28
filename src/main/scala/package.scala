@@ -15,6 +15,8 @@ package object scala {
     def isDirectory: Boolean =
       Try(Fs.statSync(path).isDirectory()).getOrElse(false)
 
-    def readSync(): String = Fs.readFileSync(path).toString("utf-8")
+    def readSync(): Try[String] = Try {
+      Fs.readFileSync(path).toString("utf-8")
+    }
   }
 }

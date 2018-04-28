@@ -2,12 +2,11 @@
 
 [![](https://travis-ci.org/laughedelic/atom-ide-scala.svg?branch=master)](https://travis-ci.org/laughedelic/atom-ide-scala)
 [![](https://img.shields.io/github/release/laughedelic/atom-ide-scala/all.svg)](https://github.com/laughedelic/atom-ide-scala/releases/latest)
-[![](https://img.shields.io/apm/v/ide-scala.svg)](https://atom.io/packages/ide-scala)
 [![](https://img.shields.io/apm/dm/ide-scala.svg)](https://atom.io/packages/ide-scala)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![](https://img.shields.io/badge/contact-gitter_chat-dd1054.svg)](https://gitter.im/laughedelic/atom-ide-scala)
 
-Scala/Dotty language support for [Atom IDE], powered by [Metals] :metal: and [Dotty language server]
+Scala & Dotty support for [Atom IDE], powered by [Metals], [Dotty] and [Ensime] language servers.
 
 ![](https://user-images.githubusercontent.com/766656/34135911-aa78092a-e463-11e7-9fdf-710a8deb4093.png)
 
@@ -87,22 +86,30 @@ Plugin gets activated only when you open a `.scala` file.
 
 ### Metals
 
-1. Follow Metals [installation instructions](https://github.com/scalameta/metals/blob/master/docs/installation.md) to prepare your Scala projects.
-1. Open a project in Atom. Once you open a Scala file, you will see the server launching.
+1. Follow Metals [installation instructions](https://github.com/scalameta/metals/blob/master/docs/installation.md) to prepare a project.
+1. Open this project in Atom. Once you open a Scala file, you will see the server launching.
 
 ### Dotty
 
 1. Setup a [Dotty sbt project](https://github.com/lampepfl/dotty-example-project) and run `sbt configureIDE` in it.  
     Official instructions may tell you to run `launchIDE` in sbt, but this command can only launch VS Code, so just use `configureIDE` instead and open the project in Atom.
-1. Open a project in Atom. Once you open a Scala file, you will see the server launching.
+1. Open this project in Atom. Once you open a Scala file, you will see the server launching.
 
 ### Ensime
 
-There is [Ensime LSP](https://github.com/ensime/ensime-server/issues/1918) support in development. See [#13](https://github.com/laughedelic/atom-ide-scala/issues/13) for details if you're interested in contributing.
+🚧 Ensime support is very much experimental, because the LSP implementation of the Ensime server is quite unstable at the moment. So even if the client works well, the server might be broken and you won't see any features working. 🚧
+
+1. Follow [Ensime documentation](http://ensime.github.io/getting_started/) to generate an `.ensime` project file.
+1. Open this project in Atom. Once you open a Scala file, the server will start (bu you may not notice it).
+1. Open the developer console (<kbd>Cmd</kbd><kbd>Alt</kbd><kbd>I</kbd>) and observe the logs (most likely errors).
+
+Follow [ensime-server#1935](https://github.com/ensime/ensime-server/issues/1935) for more information and _get involved if you want to use Ensime LSP server_.
+
 
 [Scala]: http://scala-lang.org/
 [Scala.js]: https://www.scala-js.org/
 [Atom IDE]: https://ide.atom.io/
 [Metals]: https://github.com/scalameta/metals
 [LSP]: https://github.com/Microsoft/language-server-protocol
-[Dotty language server]: http://dotty.epfl.ch/docs/usage/ide-support.html
+[Dotty]: http://dotty.epfl.ch/docs/usage/ide-support.html
+[Ensime]: http://ensime.github.io/

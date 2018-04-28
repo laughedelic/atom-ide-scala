@@ -68,7 +68,9 @@ apmKeywords := Seq(
   "lsp",
   "language-server",
   "language-server-protocol",
-  "dotty"
+  "metals",
+  "dotty",
+  "ensime",
 )
 
 apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
@@ -77,6 +79,7 @@ apmDependencies := Map(
   "atom-languageclient" -> "0.9.5",
   "atom-package-deps" -> "4.6.1",
   "@atom/source-map-support" -> "0.3.4",
+  "s-expression" -> "3.0.3",
 )
 
 apmConsumedServices := Map(

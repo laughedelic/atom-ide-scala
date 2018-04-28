@@ -155,9 +155,12 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def getRootConfigurationKey(): String =
     s"ide-scala.${server.name}"
 
-  override def mapConfigurationObject(configuration: js.Any): js.Any =
+  override def mapConfigurationObject(configuration: js.Any): js.Any = {
     // TODO: review when Dotty LS has a configuration
-    js.Dynamic.literal(
-      server.name -> configuration
-    )
+    if (server == Metals) {
+      js.Dynamic.literal(
+        server.name -> configuration
+      )
+    } else null
+  }
 }
