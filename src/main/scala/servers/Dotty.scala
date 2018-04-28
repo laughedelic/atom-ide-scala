@@ -1,7 +1,6 @@
 package laughedelic.atom.ide.scala
 
 import laughedelic.atom.config._
-import scala.util.Try
 
 object Dotty extends ScalaLanguageServer {
   val name: String = "dotty"
@@ -18,13 +17,11 @@ object Dotty extends ScalaLanguageServer {
   def watchFilter(filePath: String): Boolean = false
 
   def coursierArgs(projectPath: String): Seq[String] = {
-    val artifactRef = Try {
-      (projectPath / artifactFile).readSync().trim
-    } getOrElse {
+    val artifactRef = (projectPath / artifactFile).readSync() getOrElse {
       s"ch.epfl.lamp:dotty-language-server_0.7:${Config.dotty.version.get}"
     }
     Seq(
-      artifactRef,
+      artifactRef.trim,
       "--main", "dotty.tools.languageserver.Main",
       "--", "-stdio"
     )

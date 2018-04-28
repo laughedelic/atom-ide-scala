@@ -28,22 +28,11 @@ object Ensime extends ScalaLanguageServer {
   def coursierArgs(projectPath: String): Seq[String] = Seq()
 
   override def launch(projectPath: String): ChildProcess = {
-    val dotEnsime: DotEnsime = Try {
-      (projectPath / ensimeFile).readSync().trim
-    }.toOption.flatMap { text =>
-      sExpressions.parse(text)
-    }.getOrElse {
-      val message = "Couldn't parse `.ensime` file"
-      Atom.notifications.addError(
-        message,
-        new NotificationOptions(
-          description = s"Follow [documentation](http://ensime.github.io/build_tools) for your build tool to generate correct `.ensime` project file",
-          detail = projectPath,
-          dismissable = true,
-        )
+    val dotEnsime = (projectPath / ensimeFile).readSync()
+      .flatMap(DotEnsime.parse) getOrElse fail(
+        "Couldn't parse `.ensime` file",
+        s"Follow [documentation](http://ensime.github.io/build_tools) for your build tool to generate correct `.ensime` project file",
       )
-      throw new RuntimeException(message)
-    }
     val javaBin: String = dotEnsime.javaHome / "bin" / "java"
     val javaArgs: Seq[String] =
       dotEnsime.javaFlags ++ Seq(
@@ -62,6 +51,17 @@ object Ensime extends ScalaLanguageServer {
   }
 
   val commands = Map()
+
+  private def fail(message: String, desc: String = "") = {
+    Atom.notifications.addError(
+      message,
+      new NotificationOptions(
+        description = desc,
+        dismissable = true,
+      )
+    )
+    throw new RuntimeException(message)
+  }
 }
 
 object EnsimeConfig extends ConfigSchema {
@@ -77,6 +77,11 @@ object EnsimeConfig extends ConfigSchema {
   )
 }
 
+@js.native @JSImport("s-expression", JSImport.Namespace)
+object sExpression extends js.Object {
+  def apply(text: String): js.Any = js.native
+}
+
 case class DotEnsime(
   val scalaCompilerJars: Seq[String],
   val ensimeServerJars: Seq[String],
@@ -86,30 +91,32 @@ case class DotEnsime(
   lazy val classpath: Seq[String] = scalaCompilerJars ++ ensimeServerJars
 }
 
-object sExpressions {
+object DotEnsime {
 
-  @js.native @JSImport("s-expression", JSImport.Namespace)
-  private object parseRaw extends js.Object {
-    def apply(text: String): js.Any = js.native
-  }
-
-  def parse(text: String): Option[DotEnsime] = {
+  def parse(text: String): Try[DotEnsime] = {
     // It's parsed into a list of keys and values: (k1, v1, k2, v2, k3, v3, ...)
-    val parsedMap = parseRaw(text)
-      .asInstanceOf[js.Array[js.Any]].toSeq
-      .sliding(2, 2)
-      .collect { case Seq(x, y) => x -> y }
-      .toMap
+    val parsed: Try[Seq[js.Any]] = Try {
+      sExpression(text).asInstanceOf[js.Array[js.Any]].toSeq
+    }
+    val parsedMap: Try[Map[String, js.Any]] = parsed.map { seq =>
+      seq.sliding(2, 2)
+        .collect { case Seq(x, y) =>
+          x.toString -> y
+        }.toMap
+    }
+    def extract[T](key: String): Try[T] = parsedMap.map {
+      _.get(key).get.asInstanceOf[T]
+    }
     for {
-      scj <- parsedMap.get(":scala-compiler-jars")
-      esj <- parsedMap.get(":ensime-server-jars")
-      jf <- parsedMap.get(":java-flags")
-      jh <- parsedMap.get(":java-home")
+      scj <- extract[js.Array[String]](":scala-compiler-jars")
+      esj <- extract[js.Array[String]](":ensime-server-jars")
+      jf <- extract[js.Array[String]](":java-flags")
+      jh <- extract[String](":java-home")
     } yield DotEnsime(
-      scalaCompilerJars = scj.asInstanceOf[js.Array[String]].toSeq,
-      ensimeServerJars = esj.asInstanceOf[js.Array[String]].toSeq,
-      javaFlags = jf.asInstanceOf[js.Array[String]].toSeq,
-      // NOTE: this is a bit tricky, because it's parse as a string object and
+      scalaCompilerJars = scj,
+      ensimeServerJars = esj,
+      javaFlags = jf,
+      // NOTE: this is a bit tricky, because it's parsed as a string object and
       // we convert it to a string primitive (while for Scala it's all String)
       javaHome = jh.asInstanceOf[js.Object].valueOf().toString(),
     )
