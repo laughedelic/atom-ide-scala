@@ -86,7 +86,7 @@ Plugin gets activated only when you open a `.scala` file.
 
 ### Metals
 
-1. Follow Metals [installation instructions](https://github.com/scalameta/metals/blob/master/docs/installation.md) to prepare a project.
+1. Follow Metals [installation instructions](https://scalameta.org/metals/docs/installation-contributors.html) to prepare a project.
 1. Open this project in Atom. Once you open a Scala file, you will see the server launching.
 
 ### Dotty
