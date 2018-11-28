@@ -24,6 +24,18 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     div.classList.add("inline-block")
     div
   }
+  private val statusIcon: Element = {
+    val icon = dom.document.createElement("span")
+    icon.classList.add("icon")
+    statusElement.appendChild(icon)
+    icon
+  }
+  private val statusText: Element = {
+    val text = dom.document.createElement("span")
+    statusElement.appendChild(text)
+    text
+  }
+
 
   private def chooseServer(projectPath: String): Future[ScalaLanguageServer] = {
     val triggerred =
@@ -163,11 +175,21 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       .connection
       .asInstanceOf[js.Dynamic]
       .onCustom("metals/status", { params: js.Dynamic =>
-        val newText = params.text.toString
-          .replaceAllLiterally(raw"$$(rocket)", "🚀")
-          .replaceAllLiterally(raw"$$(check)", "✅")
-          .replaceAllLiterally(raw"$$(sync)", "🔄")
-        client.statusElement.textContent = newText
+        // Remove the old icon, if there is any
+        if (client.statusIcon.classList.length > 1) {
+          val old = client.statusIcon.classList.item(1)
+          client.statusIcon.classList.remove(old);
+        }
+        // Add new icon if there is $(name) in the text
+        val newText = raw"\$$\(([a-z]+)\)".r.replaceAllIn(
+          params.text.toString,
+          { mtch =>
+            val name = mtch.group(1)
+            client.statusIcon.classList.add(s"icon-${name}")
+            ""
+          }
+        )
+        client.statusText.textContent = newText
       })
 
     Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>

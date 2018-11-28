@@ -16,8 +16,10 @@ object Metals extends ScalaLanguageServer { server =>
   def watchFilter(filePath: String): Boolean = false
 
   override def javaExtraArgs(projectPath: String): Seq[String] =
-    Config.metals.javaArgs.get.toSeq :+
-    "-Dmetals.extensions=true"
+    Config.metals.javaArgs.get.toSeq ++ Seq(
+      "-Dmetals.extensions=true",
+      "-Dmetals.icons=octicons",
+    )
 
   def coursierArgs(projectPath: String): Seq[String] = Seq(
     s"org.scalameta:metals_2.12:${Config.metals.version.get}",
