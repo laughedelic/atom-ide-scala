@@ -1,9 +1,11 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.|, js.JSConverters._
+import org.scalajs.dom, dom.raw.Element
 import io.scalajs.nodejs.child_process.ChildProcess
 import laughedelic.atom._
 import laughedelic.atom.languageclient._
+import laughedelic.atom.ide.ui.statusbar._
 import scala.concurrent._, ExecutionContext.Implicits.global
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
@@ -16,6 +18,12 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
 
   // The rest depends on the chosen server
   private var server: ScalaLanguageServer = ScalaLanguageServer.fromConfig
+
+  private val statusElement: Element = {
+    val div = dom.document.createElement("div")
+    div.classList.add("inline-block")
+    div
+  }
 
   private def chooseServer(projectPath: String): Future[ScalaLanguageServer] = {
     val triggerred =
@@ -151,6 +159,17 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       }: js.Function1[js.Any, Unit]
     )
 
+    activeServer
+      .connection
+      .asInstanceOf[js.Dynamic]
+      .onCustom("metals/status", { params: js.Dynamic =>
+        val newText = params.text.toString
+          .replaceAllLiterally(raw"$$(rocket)", "🚀")
+          .replaceAllLiterally(raw"$$(check)", "✅")
+          .replaceAllLiterally(raw"$$(sync)", "🔄")
+        client.statusElement.textContent = newText
+      })
+
     Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>
       for {
         editor <- editorOrUndef
@@ -176,5 +195,11 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         server.name -> configuration
       )
     } else null
+  }
+
+  def consumeStatusBar(statusBar: StatusBarView): Unit = {
+    statusBar.addRightTile(new StatusTileOptions(
+      item = client.statusElement
+    ))
   }
 }

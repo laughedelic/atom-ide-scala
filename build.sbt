@@ -88,6 +88,7 @@ apmConsumedServices := Map(
   "atom-ide-busy-signal"  -> Map("0.1.0" -> "consumeBusySignal"),
   "signature-help"        -> Map("0.1.0" -> "consumeSignatureHelp"),
   "console"               -> Map("0.1.0" -> "consumeConsole"),
+  "status-bar"            -> Map("^1.0.0" -> "consumeStatusBar"),
 )
 
 apmProvidedServices := Map(
