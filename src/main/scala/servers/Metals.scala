@@ -7,7 +7,7 @@ import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "SNAPSHOT"
+  val defaultVersion: String = "0.2.0"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
