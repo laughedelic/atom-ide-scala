@@ -14,7 +14,7 @@ object Config extends ConfigSchema {
   val defaultServer = new Setting[String](
     title = "Default language server",
     description = "This server will be used when project setup is ambiguous or the above option is off",
-    default = ScalaLanguageServer.none.name,
+    default = Metals.name,
     enum = (
         ScalaLanguageServer.none +:
         ScalaLanguageServer.values
