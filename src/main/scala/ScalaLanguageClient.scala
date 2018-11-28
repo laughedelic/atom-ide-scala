@@ -150,6 +150,20 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         client.restartAllServers()
       }: js.Function1[js.Any, Unit]
     )
+
+    Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>
+      for {
+        editor <- editorOrUndef
+        if client.shouldStartForEditor(editor)
+        uri <- editor.getURI
+      } yield {
+        val fileUri = new java.net.URI("file", "", uri, null)
+        activeServer
+          .connection
+          .asInstanceOf[js.Dynamic]
+          .sendCustomNotification("metals/didFocusTextDocument", fileUri.toString)
+      }
+    }
   }
 
   override def getRootConfigurationKey(): String =
