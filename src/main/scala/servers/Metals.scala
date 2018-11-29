@@ -17,6 +17,7 @@ object Metals extends ScalaLanguageServer { server =>
 
   override def javaExtraArgs(projectPath: String): Seq[String] =
     Config.metals.javaArgs.get.toSeq ++ Seq(
+      "-Dmetals.status-bar=on",
       "-Dmetals.file-watcher=custom",
       "-Dmetals.extensions=true",
       "-Dmetals.icons=octicons",
