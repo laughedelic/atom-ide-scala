@@ -17,6 +17,7 @@ object Metals extends ScalaLanguageServer { server =>
 
   override def javaExtraArgs(projectPath: String): Seq[String] =
     Config.metals.javaArgs.get.toSeq ++ Seq(
+      "-Dmetals.slow-task=status-bar",
       "-Dmetals.status-bar=on",
       "-Dmetals.file-watcher=custom",
       "-Dmetals.extensions=true",
@@ -30,9 +31,9 @@ object Metals extends ScalaLanguageServer { server =>
   )
 
   val commands = Seq(
-    "build.import",
-    "build.connect",
-    "workspace.sources.scan",
+    "build-import",
+    "build-connect",
+    "sources-scan",
   ).map { cmd =>
     cmd -> { activeServer: ActiveServer => _: js.Any =>
       activeServer.connection.executeCommand(
