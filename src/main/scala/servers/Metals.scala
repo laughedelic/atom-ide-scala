@@ -7,7 +7,7 @@ import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "0.2.1"
+  val defaultVersion: String = "0.2.0-SNAPSHOT"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
@@ -21,7 +21,7 @@ object Metals extends ScalaLanguageServer { server =>
       "-Dmetals.status-bar=on",
       "-Dmetals.file-watcher=custom",
       "-Dmetals.extensions=true",
-      "-Dmetals.icons=octicons",
+      "-Dmetals.icons=atom",
     )
 
   def coursierArgs(projectPath: String): Seq[String] = Seq(
