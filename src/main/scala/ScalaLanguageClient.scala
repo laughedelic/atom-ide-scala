@@ -33,27 +33,10 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       else Nil
 
     triggerred match {
-      case Nil if !Config.autoServer.get && !ScalaLanguageServer.defaultNonEmpty => {
-        Atom.notifications.addError(
-          "No Scala language server is selected",
-          new NotificationOptions(
-            description = "Automatic server selection is off and no default is chosen. Go to the [ide-scala settings](atom://settings-view/show-package?package=ide-scala) to fix it.",
-            detail = projectPath,
-            dismissable = true,
-            icon = "mute",
-          )
-        )
-        Future(ScalaLanguageServer.none)
-      }
-
       case Nil => {
         val default = ScalaLanguageServer.fromConfig
-        val title = "Project is not setup" ++ {
-          if (default == ScalaLanguageServer.none) " for any Scala language server"
-          else s", using default language server: **${default.name.capitalize}**"
-        }
-        Atom.notifications.addWarning(
-          title,
+        Atom.notifications.addInfo(
+          "Project is not setup, using default language server: **${default.name.capitalize}**",
           new NotificationOptions(
             description = "To learn how to setup new projects, follow the [documentation](https://github.com/laughedelic/atom-ide-scala#usage)",
             detail = projectPath,
@@ -119,10 +102,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def startServerProcess(
     projectPath: String
   ): ChildProcess | js.Promise[ChildProcess] = {
-    chooseServer(projectPath).map {
-      case ScalaLanguageServer.none =>
-        throw new RuntimeException("Couldn't start server: project is not setup and default server is not chosen")
-      case chosen =>
+    chooseServer(projectPath).map { chosen =>
         server = chosen
         // `name` field is set early and then used in some UI elements (instead of
         // `getServerName`), we can update it here to fix, for example, logger console

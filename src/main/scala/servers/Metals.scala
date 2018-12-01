@@ -13,7 +13,7 @@ object minimatch extends js.Object {
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "0.2.0-SNAPSHOT"
+  val defaultVersion: String = "0.2.3-SNAPSHOT"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
@@ -81,7 +81,6 @@ object MetalsConfig extends ConfigSchema {
   // These are custom settings for the Metals launcher
   val version = new Setting[String](
     title = "Metals version",
-    description = "Set it to `SNAPSHOT` if you're working on Metals and publish it locally",
     default = Metals.defaultVersion,
   )
 

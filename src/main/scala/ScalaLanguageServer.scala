@@ -40,6 +40,8 @@ trait ScalaLanguageServer {
 
 object ScalaLanguageServer {
 
+  val default = Metals
+
   def fromName(name: String): Option[ScalaLanguageServer] =
     name match {
       case Metals.name | "scalameta" => Some(Metals)
@@ -49,25 +51,10 @@ object ScalaLanguageServer {
     }
 
   def fromConfig: ScalaLanguageServer =
-    fromName(Config.defaultServer.get).getOrElse(none)
+    fromName(Config.defaultServer.get).getOrElse(default)
 
   def defaultNonEmpty: Boolean =
     fromName(Config.defaultServer.get).nonEmpty
 
-  val values = List(Metals, Dotty, Ensime)
-
-  // An empty server which can be used to initialize the client, before the
-  // config is accessible or projet setup can be determined
-  object none extends ScalaLanguageServer {
-    val name: String = ""
-    val description: String = "none"
-    val defaultVersion: String = ""
-    def trigger(projectPath: String): Boolean = false
-    def watchFilter(filePath: String): Boolean = false
-    def coursierArgs(projectPath: String): Seq[String] = Seq()
-    val commands = Map()
-
-    // FIXME: should do exactly nothing
-    // override def launch(projectPath: String): ChildProcess = ???
-  }
+  val values = List(Metals, Dotty)
 }

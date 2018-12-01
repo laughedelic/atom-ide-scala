@@ -39,7 +39,7 @@ object Ensime extends ScalaLanguageServer {
         "-classpath", dotEnsime.classpath.mkString(Path.delimiter),
         s"-Densime.config=${projectPath / ensimeFile}", // saw it somewhere, not sure it's needed
         s"-Dlsp.workspace=${projectPath}",
-        s"-Dlsp.logLevel=${Config.ensime.logLevel.get}",
+        // s"-Dlsp.logLevel=${Config.ensime.logLevel.get}", // ensime config is removed for now
         "org.ensime.server.Server", "--lsp"
       )
     println((javaBin +: javaArgs).mkString("\n"))
