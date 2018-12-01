@@ -80,6 +80,7 @@ apmDependencies := Map(
   "atom-package-deps" -> "4.6.2",
   "@atom/source-map-support" -> "0.3.4",
   "s-expression" -> "3.0.3",
+  "minimatch" -> "3.0.4",
 )
 
 apmConsumedServices := Map(

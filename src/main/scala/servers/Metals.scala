@@ -1,8 +1,13 @@
 package laughedelic.atom.ide.scala
 
-import scala.scalajs.js
+import scala.scalajs.js, js.annotation._
 import laughedelic.atom.config._
 import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
+
+@js.native @JSImport("minimatch", JSImport.Default)
+object minimatch extends js.Object {
+  def apply(path: String, pattern: String): Boolean = js.native
+}
 
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
@@ -13,7 +18,10 @@ object Metals extends ScalaLanguageServer { server =>
     (projectPath / ".metals").isDirectory
   }
 
-  def watchFilter(filePath: String): Boolean = false
+  def watchFilter(filePath: String): Boolean = {
+    minimatch(filePath, "**/*.{scala,sbt,java}") ||
+    minimatch(filePath, "**/project/build.properties")
+  }
 
   override def javaExtraArgs(projectPath: String): Seq[String] =
     Config.metals.javaArgs.get.toSeq ++ Seq(
