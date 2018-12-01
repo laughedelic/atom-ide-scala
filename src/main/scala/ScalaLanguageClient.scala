@@ -13,13 +13,13 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
   override def getLanguageName(): String = "Scala"
   override def shouldStartForEditor(editor: TextEditor): Boolean =
-    editor.getURI.map(_.endsWith(".scala")).getOrElse(false)
-    // && (Config.autoServer.get || ScalaLanguageServer.defaultNonEmpty)
+    editor.getURI.filter(_.endsWith(".scala")).nonEmpty
 
   // The rest depends on the chosen server
   private var server: ScalaLanguageServer = ScalaLanguageServer.fromConfig
 
-  private val statusElement: Element = {
+  // Status bar tile which will show status updates from the language server
+  val statusBarTile: Element = {
     val div = dom.document.createElement("div")
     div.classList.add("inline-block")
     div
@@ -132,10 +132,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     }.toJSPromise
   }
 
-  private def camelToKebab(str: String) =
-    "[A-Z]".r.replaceAllIn(str, { "-" + _.group(0).toLowerCase() })
-
-  override def postInitialization(activeServer: ActiveServer): Unit = {
+  private def addServerCommands(activeServer: ActiveServer): Unit = {
     activeServer
       .capabilities
       .executeCommandProvider
@@ -159,27 +156,11 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         client.restartAllServers()
       }: js.Function1[js.Any, Unit]
     )
+  }
 
-    activeServer
-      .connection
-      .asInstanceOf[js.Dynamic]
-      .onCustom("metals/status", { params: js.Dynamic =>
-        client.statusElement.innerHTML = params.text.toString
-      })
-
-    Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>
-      for {
-        editor <- editorOrUndef
-        if client.shouldStartForEditor(editor)
-        uri <- editor.getURI
-      } yield {
-        val fileUri = new java.net.URI("file", "", uri, null)
-        activeServer
-          .connection
-          .asInstanceOf[js.Dynamic]
-          .sendCustomNotification("metals/didFocusTextDocument", fileUri.toString)
-      }
-    }
+  override def postInitialization(activeServer: ActiveServer): Unit = {
+    addServerCommands(activeServer)
+    server.postInitialization(client, activeServer)
   }
 
   override def getRootConfigurationKey(): String =
@@ -196,7 +177,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
 
   def consumeStatusBar(statusBar: StatusBarView): Unit = {
     statusBar.addRightTile(new StatusTileOptions(
-      item = client.statusElement
+      item = client.statusBarTile
     ))
   }
 }

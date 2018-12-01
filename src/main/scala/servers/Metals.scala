@@ -1,10 +1,11 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.annotation._
+import laughedelic.atom.Atom
 import laughedelic.atom.config._
 import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
 
-@js.native @JSImport("minimatch", JSImport.Default)
+@js.native @JSImport("minimatch", JSImport.Namespace)
 object minimatch extends js.Object {
   def apply(path: String, pattern: String): Boolean = js.native
 }
@@ -49,6 +50,30 @@ object Metals extends ScalaLanguageServer { server =>
       )
     }
   }.toMap
+
+  override def postInitialization(client: ScalaLanguageClient, activeServer: ActiveServer): Unit = {
+    activeServer
+      .connection
+      .asInstanceOf[js.Dynamic]
+      .onCustom("metals/status", { params: js.Dynamic =>
+        client.statusBarTile.innerHTML = params.text.toString
+      })
+
+    Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>
+      for {
+        editor <- editorOrUndef
+        if client.shouldStartForEditor(editor)
+        uri <- editor.getURI
+      } yield {
+        val fileUri = new java.net.URI("file", "", uri, null)
+        activeServer
+          .connection
+          .asInstanceOf[js.Dynamic]
+          .sendCustomNotification("metals/didFocusTextDocument", fileUri.toString)
+      }
+    }
+  }
+
 }
 
 object MetalsConfig extends ConfigSchema {
