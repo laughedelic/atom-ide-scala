@@ -36,11 +36,10 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       case Nil => {
         val default = ScalaLanguageServer.fromConfig
         Atom.notifications.addInfo(
-          "Project is not setup, using default language server: **${default.name.capitalize}**",
+          s"Project is not setup, using default language server: **${default.name.capitalize}**",
           new NotificationOptions(
-            description = "To learn how to setup new projects, follow the [documentation](https://github.com/laughedelic/atom-ide-scala#usage)",
             detail = projectPath,
-            dismissable = true,
+            dismissable = false,
             icon = "plug",
           )
         )
@@ -113,28 +112,49 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   }
 
   private def addServerCommands(activeServer: ActiveServer): Unit = {
-    activeServer
+    def capitalizeWords(str: String): String =
+      str.split("\\s+").map(_.capitalize).mkString(" ")
+
+    def displayName(category: String, name: String): String =
+      s"${capitalizeWords(category)}: ${capitalizeWords(name)}"
+
+    // What we got from the server on initialization
+    val declaredCommands = activeServer
       .capabilities
       .executeCommandProvider
       .map(_.commands).getOrElse(js.Array())
-      .foreach { cmd =>
-        server.commands.get(cmd).foreach { handler =>
-          Atom.commands.add(
-            "atom-workspace",
-            s"${server.name}:${cmd}",
-            { node =>
-              handler(activeServer)(node)
-            }: js.Function1[js.Any, Unit]
-          )
-        }
-      }
 
+    // What we are aware of
+    val knownCommands = server.commands
+
+    for {
+      cmd <- declaredCommands
+      title <- knownCommands.get(cmd)
+    } yield {
+      Atom.commands.add(
+        target = "atom-workspace",
+        commandName = s"${server.name}:${cmd}",
+        new CommandListener(
+          displayName = displayName(server.name, title)
+        )({ node =>
+            activeServer.connection.executeCommand(
+              new ExecuteCommandParams(command = cmd)
+            )
+          }: js.Function1[js.Any, Unit]
+        )
+      )
+    }
+
+    // An additional command implemented through the atom-languageclient API
     Atom.commands.add(
-      "atom-workspace",
-      s"ide-scala:restart-all-language-servers",
-      { _ =>
-        client.restartAllServers()
-      }: js.Function1[js.Any, Unit]
+      target = "atom-workspace",
+      commandName = s"${server.name}:restart-server",
+      new CommandListener(
+        displayName = displayName(server.name, "Restart Server")
+      )({ _ =>
+          client.restartAllServers()
+        }: js.Function1[js.Any, Unit]
+      )
     )
   }
 
