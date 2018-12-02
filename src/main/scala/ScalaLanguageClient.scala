@@ -113,28 +113,43 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   }
 
   private def addServerCommands(activeServer: ActiveServer): Unit = {
+    def capitalizeWords(str: String): String =
+      str.split("\\s+").map(_.capitalize).mkString(" ")
+
+    def displayName(category: String, name: String): String =
+      s"${capitalizeWords(category)}: ${capitalizeWords(name)}"
+
     activeServer
       .capabilities
       .executeCommandProvider
       .map(_.commands).getOrElse(js.Array())
       .foreach { cmd =>
-        server.commands.get(cmd).foreach { handler =>
+        server.commands.get(cmd).foreach { title =>
           Atom.commands.add(
-            "atom-workspace",
-            s"${server.name}:${cmd}",
-            { node =>
-              handler(activeServer)(node)
-            }: js.Function1[js.Any, Unit]
+            target = "atom-workspace",
+            commandName = s"${server.name}:${cmd}",
+            new CommandListener(
+              displayName = displayName(server.name, title)
+            )({ node =>
+                activeServer.connection.executeCommand(
+                  new ExecuteCommandParams(command = cmd)
+                )
+              }: js.Function1[js.Any, Unit]
+            )
           )
         }
       }
 
+    // An additional command implemented through the atom-languageclient API
     Atom.commands.add(
-      "atom-workspace",
-      s"ide-scala:restart-all-language-servers",
-      { _ =>
-        client.restartAllServers()
-      }: js.Function1[js.Any, Unit]
+      target = "atom-workspace",
+      commandName = s"${server.name}:restart-server",
+      new CommandListener(
+        displayName = displayName(server.name, "Restart Server")
+      )({ _ =>
+          client.restartAllServers()
+        }: js.Function1[js.Any, Unit]
+      )
     )
   }
 

@@ -30,7 +30,7 @@ trait ScalaLanguageServer {
     )
   }
 
-  val commands: Map[String, ActiveServer => js.Any => Any]
+  val commands: Map[String, String]
 
   def postInitialization(
     client: ScalaLanguageClient,

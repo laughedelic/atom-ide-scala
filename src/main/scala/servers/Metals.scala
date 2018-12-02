@@ -4,7 +4,7 @@ import scala.scalajs.js, js.annotation._
 import org.scalajs.dom, dom.raw.Element
 import laughedelic.atom.Atom
 import laughedelic.atom.config._
-import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
+import laughedelic.atom.languageclient.ActiveServer
 
 // For matching glob patterns
 @js.native @JSImport("minimatch", JSImport.Namespace)
@@ -54,18 +54,12 @@ object Metals extends ScalaLanguageServer { server =>
     "--main", "scala.meta.metals.Main"
   )
 
-  val commands = Seq(
-    "build-import",
-    "build-connect",
-    "sources-scan",
-    "doctor-run",
-  ).map { cmd =>
-    cmd -> { activeServer: ActiveServer => _: js.Any =>
-      activeServer.connection.executeCommand(
-        new ExecuteCommandParams(command = cmd)
-      )
-    }
-  }.toMap
+  val commands = Map(
+    "build-import" -> "Import build",
+    "build-connect" -> "Connect to build server",
+    "sources-scan" -> "Rescan sources",
+    "doctor-run" -> "Run Doctor",
+  )
 
   override def postInitialization(client: ScalaLanguageClient, activeServer: ActiveServer): Unit = {
     activeServer
@@ -84,7 +78,7 @@ object Metals extends ScalaLanguageServer { server =>
             dispatchAtomCommand("console:toggle")
           case "metals-diagnostics-focus" =>
             dispatchAtomCommand("diagnostics:toggle-table")
-          case "metals-run-doctor" => {
+          case "metals-doctor-run" => {
             val html = params.arguments.toString
             Atom.asInstanceOf[js.Dynamic]
               .views
