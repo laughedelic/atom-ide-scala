@@ -36,11 +36,10 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       case Nil => {
         val default = ScalaLanguageServer.fromConfig
         Atom.notifications.addInfo(
-          "Project is not setup, using default language server: **${default.name.capitalize}**",
+          s"Project is not setup, using default language server: **${default.name.capitalize}**",
           new NotificationOptions(
-            description = "To learn how to setup new projects, follow the [documentation](https://github.com/laughedelic/atom-ide-scala#usage)",
             detail = projectPath,
-            dismissable = true,
+            dismissable = false,
             icon = "plug",
           )
         )
