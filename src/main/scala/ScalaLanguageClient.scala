@@ -118,26 +118,32 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     def displayName(category: String, name: String): String =
       s"${capitalizeWords(category)}: ${capitalizeWords(name)}"
 
-    activeServer
+    // What we got from the server on initialization
+    val declaredCommands = activeServer
       .capabilities
       .executeCommandProvider
       .map(_.commands).getOrElse(js.Array())
-      .foreach { cmd =>
-        server.commands.get(cmd).foreach { title =>
-          Atom.commands.add(
-            target = "atom-workspace",
-            commandName = s"${server.name}:${cmd}",
-            new CommandListener(
-              displayName = displayName(server.name, title)
-            )({ node =>
-                activeServer.connection.executeCommand(
-                  new ExecuteCommandParams(command = cmd)
-                )
-              }: js.Function1[js.Any, Unit]
+
+    // What we are aware of
+    val knownCommands = server.commands
+
+    for {
+      cmd <- declaredCommands
+      title <- knownCommands.get(cmd)
+    } yield {
+      Atom.commands.add(
+        target = "atom-workspace",
+        commandName = s"${server.name}:${cmd}",
+        new CommandListener(
+          displayName = displayName(server.name, title)
+        )({ node =>
+            activeServer.connection.executeCommand(
+              new ExecuteCommandParams(command = cmd)
             )
-          )
-        }
-      }
+          }: js.Function1[js.Any, Unit]
+        )
+      )
+    }
 
     // An additional command implemented through the atom-languageclient API
     Atom.commands.add(

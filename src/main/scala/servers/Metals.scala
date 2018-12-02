@@ -58,7 +58,7 @@ object Metals extends ScalaLanguageServer { server =>
     "build-import" -> "Import build",
     "build-connect" -> "Connect to build server",
     "sources-scan" -> "Rescan sources",
-    "doctor-run" -> "Run Doctor",
+    "doctor-run" -> "Run doctor",
   )
 
   override def postInitialization(client: ScalaLanguageClient, activeServer: ActiveServer): Unit = {
