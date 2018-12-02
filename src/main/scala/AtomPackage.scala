@@ -2,6 +2,7 @@ package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.annotation._, js.Dynamic.global
 import laughedelic.atom.ide.ui.busysignal.BusySignalService
+import laughedelic.atom.ide.ui.statusbar.StatusBarView
 import laughedelic.atom.packagedeps.packageDeps
 
 @js.native @JSImport("@atom/source-map-support", JSImport.Namespace)
@@ -64,5 +65,7 @@ object AtomPackage {
   def consumeSignatureHelp(registry: js.Any): js.Any = client.consumeSignatureHelp(registry)
   @JSExportTopLevel("consumeConsole")
   def consumeConsole(service: js.Any): js.Any = client.consumeConsole(service)
+  @JSExportTopLevel("consumeStatusBar")
+  def consumeStatusBar(statusBar: StatusBarView): Unit = client.consumeStatusBar(statusBar)
 
 }

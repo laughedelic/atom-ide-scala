@@ -21,7 +21,7 @@ developers := List(Developer(
   url("https://github.com/laughedelic")
 ))
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.7"
 scalacOptions ++= Seq(
   "-encoding", "utf8",
   "-feature",
@@ -73,13 +73,14 @@ apmKeywords := Seq(
   "ensime",
 )
 
-apmEngines := Map("atom" -> ">=1.21.0 <2.0.0")
+apmEngines := Map("atom" -> ">=1.25.0 <2.0.0")
 
 apmDependencies := Map(
-  "atom-languageclient" -> "0.9.5",
-  "atom-package-deps" -> "4.6.1",
+  "atom-languageclient" -> "0.9.8",
+  "atom-package-deps" -> "4.6.2",
   "@atom/source-map-support" -> "0.3.4",
   "s-expression" -> "3.0.3",
+  "minimatch" -> "3.0.4",
 )
 
 apmConsumedServices := Map(
@@ -88,6 +89,7 @@ apmConsumedServices := Map(
   "atom-ide-busy-signal"  -> Map("0.1.0" -> "consumeBusySignal"),
   "signature-help"        -> Map("0.1.0" -> "consumeSignatureHelp"),
   "console"               -> Map("0.1.0" -> "consumeConsole"),
+  "status-bar"            -> Map("^1.0.0" -> "consumeStatusBar"),
 )
 
 apmProvidedServices := Map(

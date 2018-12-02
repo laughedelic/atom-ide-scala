@@ -1,9 +1,11 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.|, js.JSConverters._
+import org.scalajs.dom, dom.raw.Element
 import io.scalajs.nodejs.child_process.ChildProcess
 import laughedelic.atom._
 import laughedelic.atom.languageclient._
+import laughedelic.atom.ide.ui.statusbar._
 import scala.concurrent._, ExecutionContext.Implicits.global
 
 class ScalaLanguageClient extends AutoLanguageClient { client =>
@@ -11,11 +13,18 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
   override def getLanguageName(): String = "Scala"
   override def shouldStartForEditor(editor: TextEditor): Boolean =
-    editor.getURI.map(_.endsWith(".scala")).getOrElse(false)
-    // && (Config.autoServer.get || ScalaLanguageServer.defaultNonEmpty)
+    editor.getURI.filter(_.endsWith(".scala")).nonEmpty
 
   // The rest depends on the chosen server
   private var server: ScalaLanguageServer = ScalaLanguageServer.fromConfig
+
+  // Status bar tile which will show status updates from the language server
+  val statusBarTile: Element = {
+    val div = dom.document.createElement("div")
+    div.classList.add("inline-block")
+    div
+  }
+
 
   private def chooseServer(projectPath: String): Future[ScalaLanguageServer] = {
     val triggerred =
@@ -24,27 +33,10 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       else Nil
 
     triggerred match {
-      case Nil if !Config.autoServer.get && !ScalaLanguageServer.defaultNonEmpty => {
-        Atom.notifications.addError(
-          "No Scala language server is selected",
-          new NotificationOptions(
-            description = "Automatic server selection is off and no default is chosen. Go to the [ide-scala settings](atom://settings-view/show-package?package=ide-scala) to fix it.",
-            detail = projectPath,
-            dismissable = true,
-            icon = "mute",
-          )
-        )
-        Future(ScalaLanguageServer.none)
-      }
-
       case Nil => {
         val default = ScalaLanguageServer.fromConfig
-        val title = "Project is not setup" ++ {
-          if (default == ScalaLanguageServer.none) " for any Scala language server"
-          else s", using default language server: **${default.name.capitalize}**"
-        }
-        Atom.notifications.addWarning(
-          title,
+        Atom.notifications.addInfo(
+          "Project is not setup, using default language server: **${default.name.capitalize}**",
           new NotificationOptions(
             description = "To learn how to setup new projects, follow the [documentation](https://github.com/laughedelic/atom-ide-scala#usage)",
             detail = projectPath,
@@ -110,10 +102,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   override def startServerProcess(
     projectPath: String
   ): ChildProcess | js.Promise[ChildProcess] = {
-    chooseServer(projectPath).map {
-      case ScalaLanguageServer.none =>
-        throw new RuntimeException("Couldn't start server: project is not setup and default server is not chosen")
-      case chosen =>
+    chooseServer(projectPath).map { chosen =>
         server = chosen
         // `name` field is set early and then used in some UI elements (instead of
         // `getServerName`), we can update it here to fix, for example, logger console
@@ -123,10 +112,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     }.toJSPromise
   }
 
-  private def camelToKebab(str: String) =
-    "[A-Z]".r.replaceAllIn(str, { "-" + _.group(0).toLowerCase() })
-
-  override def postInitialization(activeServer: ActiveServer): Unit = {
+  private def addServerCommands(activeServer: ActiveServer): Unit = {
     activeServer
       .capabilities
       .executeCommandProvider
@@ -135,7 +121,7 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         server.commands.get(cmd).foreach { handler =>
           Atom.commands.add(
             "atom-workspace",
-            s"${server.name}:${camelToKebab(cmd)}",
+            s"${server.name}:${cmd}",
             { node =>
               handler(activeServer)(node)
             }: js.Function1[js.Any, Unit]
@@ -152,6 +138,11 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
     )
   }
 
+  override def postInitialization(activeServer: ActiveServer): Unit = {
+    addServerCommands(activeServer)
+    server.postInitialization(client, activeServer)
+  }
+
   override def getRootConfigurationKey(): String =
     s"ide-scala.${server.name}"
 
@@ -162,5 +153,11 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
         server.name -> configuration
       )
     } else null
+  }
+
+  def consumeStatusBar(statusBar: StatusBarView): Unit = {
+    statusBar.addRightTile(new StatusTileOptions(
+      item = client.statusBarTile
+    ))
   }
 }
