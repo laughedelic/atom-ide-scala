@@ -27,7 +27,7 @@ class HtmlView(title: String, html: String) extends js.Object {
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "0.2.5"
+  val defaultVersion: String = "0.2.11"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
