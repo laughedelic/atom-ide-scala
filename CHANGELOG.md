@@ -1,0 +1,1 @@
+This release is focused on updating to the new version of [Metals v0.2](https://github.com/scalameta/metals/releases/tag/v0.2.5). See [#69](https://github.com/laughedelic/atom-ide-scala/pull/69) for details.
