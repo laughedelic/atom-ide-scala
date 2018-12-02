@@ -1,0 +1,102 @@
+{
+  "name" : "ide-scala",
+  "main" : "./lib/main.js",
+  "version" : "0.8.1",
+  "description" : "Scala & Dotty language support for Atom IDE",
+  "author" : {
+    "name" : "Alexey Alekhin",
+    "email" : "laughedelic@gmail.com",
+    "url" : "https://github.com/laughedelic"
+  },
+  "repository" : "https://github.com/laughedelic/atom-ide-scala",
+  "bugs" : "https://github.com/laughedelic/atom-ide-scala/issues",
+  "license" : "MIT",
+  "keywords" : [ "scala", "scalameta", "ide", "atom-ide", "lsp", "language-server", "language-server-protocol", "metals", "dotty", "ensime" ],
+  "engines" : {
+    "atom" : ">=1.25.0 <2.0.0"
+  },
+  "dependencies" : {
+    "@atom/source-map-support" : "0.3.4",
+    "s-expression" : "3.0.3",
+    "minimatch" : "3.0.4",
+    "atom-languageclient" : "0.9.8",
+    "atom-package-deps" : "4.6.2"
+  },
+  "consumedServices" : {
+    "datatip" : {
+      "versions" : {
+        "0.1.0" : "consumeDatatip"
+      }
+    },
+    "atom-ide-busy-signal" : {
+      "versions" : {
+        "0.1.0" : "consumeBusySignal"
+      }
+    },
+    "signature-help" : {
+      "versions" : {
+        "0.1.0" : "consumeSignatureHelp"
+      }
+    },
+    "status-bar" : {
+      "versions" : {
+        "^1.0.0" : "consumeStatusBar"
+      }
+    },
+    "linter-indie" : {
+      "versions" : {
+        "2.0.0" : "consumeLinterV2"
+      }
+    },
+    "console" : {
+      "versions" : {
+        "0.1.0" : "consumeConsole"
+      }
+    }
+  },
+  "providedServices" : {
+    "autocomplete.provider" : {
+      "versions" : {
+        "2.0.0" : "provideAutocomplete"
+      }
+    },
+    "code-format.range" : {
+      "versions" : {
+        "0.1.0" : "provideCodeFormat"
+      }
+    },
+    "code-actions" : {
+      "versions" : {
+        "0.1.0" : "provideCodeActions"
+      }
+    },
+    "hyperclick" : {
+      "versions" : {
+        "0.1.0" : "provideHyperclick"
+      }
+    },
+    "find-references" : {
+      "versions" : {
+        "0.1.0" : "provideFindReferences"
+      }
+    },
+    "definitions" : {
+      "versions" : {
+        "0.1.0" : "provideDefinitions"
+      }
+    },
+    "code-highlight" : {
+      "versions" : {
+        "0.1.0" : "provideCodeHighlight"
+      }
+    },
+    "outline-view" : {
+      "versions" : {
+        "0.1.0" : "provideOutlines"
+      }
+    }
+  },
+  "enhancedScopes" : [ "source.scala" ],
+  "package-deps" : [ "language-scala", "atom-ide-ui" ],
+  "activationHooks" : [ "language-scala:grammar-used" ]
+}
