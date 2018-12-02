@@ -1,5 +1,8 @@
 package laughedelic.atom.ide
 
+import _root_.scala.scalajs.js
+import laughedelic.atom.Atom
+import org.scalajs.dom.raw.Element
 import io.scalajs.nodejs.path.Path
 import io.scalajs.nodejs.fs.Fs
 import util.Try
@@ -18,5 +21,10 @@ package object scala {
     def readSync(): Try[String] = Try {
       Fs.readFileSync(path).toString("utf-8")
     }
+  }
+
+  def dispatchAtomCommand(command: String): Unit = {
+    val target = Atom.asInstanceOf[js.Dynamic].views.getView(Atom.workspace).asInstanceOf[Element]
+    Atom.commands.dispatch(target, command)
   }
 }

@@ -1,13 +1,27 @@
 package laughedelic.atom.ide.scala
 
 import scala.scalajs.js, js.annotation._
+import org.scalajs.dom, dom.raw.Element
 import laughedelic.atom.Atom
 import laughedelic.atom.config._
 import laughedelic.atom.languageclient.{ ActiveServer, ExecuteCommandParams }
 
+// For matching glob patterns
 @js.native @JSImport("minimatch", JSImport.Namespace)
 object minimatch extends js.Object {
   def apply(path: String, pattern: String): Boolean = js.native
+}
+
+// For rendering Metals Doctor output
+class HtmlView(title: String, html: String) extends js.Object {
+
+  def getTitle(): String = title
+
+  def getViewClass(): Element = {
+    val div = dom.document.createElement("div")
+    div.innerHTML = html
+    div
+  }
 }
 
 object Metals extends ScalaLanguageServer { server =>
@@ -31,6 +45,7 @@ object Metals extends ScalaLanguageServer { server =>
       "-Dmetals.file-watcher=custom",
       "-Dmetals.extensions=true",
       "-Dmetals.icons=atom",
+      "-Dmetals.execute-client-command=on",
     )
 
   def coursierArgs(projectPath: String): Seq[String] = Seq(
@@ -43,6 +58,7 @@ object Metals extends ScalaLanguageServer { server =>
     "build-import",
     "build-connect",
     "sources-scan",
+    "doctor-run",
   ).map { cmd =>
     cmd -> { activeServer: ActiveServer => _: js.Any =>
       activeServer.connection.executeCommand(
@@ -57,6 +73,28 @@ object Metals extends ScalaLanguageServer { server =>
       .asInstanceOf[js.Dynamic]
       .onCustom("metals/status", { params: js.Dynamic =>
         client.statusBarTile.innerHTML = params.text.toString
+      })
+
+    activeServer
+      .connection
+      .asInstanceOf[js.Dynamic]
+      .onCustom("metals/executeClientCommand", { params: js.Dynamic =>
+        params.command.toString match {
+          case "metals-logs-toggle" =>
+            dispatchAtomCommand("console:toggle")
+          case "metals-diagnostics-focus" =>
+            dispatchAtomCommand("diagnostics:toggle-table")
+          case "metals-run-doctor" => {
+            val html = params.arguments.toString
+            Atom.asInstanceOf[js.Dynamic]
+              .views
+              .addViewProvider({ _.getViewClass }: js.Function1[HtmlView, Element])
+            Atom.workspace.asInstanceOf[js.Dynamic]
+              .getActivePane()
+              .activateItem(new HtmlView("Metals Doctor", html))
+          }
+          case _ => {}
+        }
       })
 
     Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>
