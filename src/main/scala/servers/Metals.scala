@@ -5,6 +5,7 @@ import org.scalajs.dom, dom.raw.Element
 import laughedelic.atom.Atom
 import laughedelic.atom.config._
 import laughedelic.atom.languageclient.ActiveServer
+import scala.concurrent._, ExecutionContext.Implicits.global
 
 // For matching glob patterns
 @js.native @JSImport("minimatch", JSImport.Namespace)
@@ -68,10 +69,6 @@ object Metals extends ScalaLanguageServer { server =>
       .onCustom("metals/status", { params: js.Dynamic =>
         client.statusBarTile.innerHTML = params.text.toString
       })
-
-    activeServer
-      .connection
-      .asInstanceOf[js.Dynamic]
       .onCustom("metals/executeClientCommand", { params: js.Dynamic =>
         params.command.toString match {
           case "metals-logs-toggle" =>
@@ -97,11 +94,18 @@ object Metals extends ScalaLanguageServer { server =>
         if client.shouldStartForEditor(editor)
         uri <- editor.getURI
       } yield {
-        val fileUri = new java.net.URI("file", "", uri, null)
-        activeServer
-          .connection
-          .asInstanceOf[js.Dynamic]
-          .sendCustomNotification("metals/didFocusTextDocument", fileUri.toString)
+        client
+          .getConnectionForEditor(editor).toFuture
+          .foreach { connectionOrUndef =>
+            connectionOrUndef.foreach { connection =>
+              val fileUri = new java.net.URI("file", "", uri, null)
+              connection.asInstanceOf[js.Dynamic]
+                .sendCustomNotification(
+                  "metals/didFocusTextDocument",
+                  fileUri.toString
+                )
+            }
+          }
       }
     }
   }
