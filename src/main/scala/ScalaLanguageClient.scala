@@ -12,8 +12,6 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
   // Constant values common for all servers
   override def getGrammarScopes(): js.Array[String] = js.Array("source.scala")
   override def getLanguageName(): String = "Scala"
-  override def shouldStartForEditor(editor: TextEditor): Boolean =
-    editor.getURI.filter(_.endsWith(".scala")).nonEmpty
 
   // The rest depends on the chosen server
   private var server: ScalaLanguageServer = ScalaLanguageServer.fromConfig
