@@ -69,7 +69,7 @@ object Metals extends ScalaLanguageServer { server =>
     connection
       .onCustom("metals/status", { params: js.Dynamic =>
         Atom.workspace.getActiveTextEditor().foreach { editor =>
-          if (client.shouldSyncForEditor(editor, projectPath)) {
+          if (client.isFileInProject(editor, projectPath)) {
             client.statusBarTile.innerHTML = params.text.toString
           }
         }
@@ -117,9 +117,9 @@ object Metals extends ScalaLanguageServer { server =>
       }
 
       // Remove status when switching to unrelated tabs
-      val shouldSync = editorOrUndef.fold(false) {
-        client.shouldSyncForEditor(_, projectPath)
-      }
+      val shouldSync = editorOrUndef.filter { editor =>
+        client.isFileInProject(editor, projectPath)
+      }.nonEmpty
       if (!shouldSync) {
         client.statusBarTile.innerHTML = ""
       }
