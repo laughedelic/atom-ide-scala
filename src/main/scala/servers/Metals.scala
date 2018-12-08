@@ -75,6 +75,10 @@ object Metals extends ScalaLanguageServer { server =>
         }
       })
 
+    Atom.asInstanceOf[js.Dynamic]
+      .views
+      .addViewProvider({ _.getViewClass }: js.Function1[HtmlView, Element])
+
     connection
       .onCustom("metals/executeClientCommand", { params: js.Dynamic =>
         params.command.toString match {
@@ -82,14 +86,15 @@ object Metals extends ScalaLanguageServer { server =>
             dispatchAtomCommand("console:toggle")
           case "metals-diagnostics-focus" =>
             dispatchAtomCommand("diagnostics:toggle-table")
-          case "metals-doctor-run" => {
+          case "metals-doctor-run" | "metals-doctor-reload" => {
             val html = params.arguments.toString
-            Atom.asInstanceOf[js.Dynamic]
-              .views
-              .addViewProvider({ _.getViewClass }: js.Function1[HtmlView, Element])
             Atom.workspace.asInstanceOf[js.Dynamic]
+              .getCenter()
               .getActivePane()
-              .activateItem(new HtmlView("Metals Doctor", html))
+              .activateItem(
+                new HtmlView("Metals Doctor", html),
+                js.Dynamic.literal(pending = true)
+              )
           }
           case _ => {}
         }
