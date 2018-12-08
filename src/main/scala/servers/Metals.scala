@@ -63,12 +63,19 @@ object Metals extends ScalaLanguageServer { server =>
   )
 
   override def postInitialization(client: ScalaLanguageClient, activeServer: ActiveServer): Unit = {
-    activeServer
-      .connection
-      .asInstanceOf[js.Dynamic]
+    val projectPath = activeServer.projectPath
+    val connection = activeServer.connection.asInstanceOf[js.Dynamic]
+
+    connection
       .onCustom("metals/status", { params: js.Dynamic =>
-        client.statusBarTile.innerHTML = params.text.toString
+        Atom.workspace.getActiveTextEditor().foreach { editor =>
+          if (client.shouldSyncForEditor(editor, projectPath)) {
+            client.statusBarTile.innerHTML = params.text.toString
+          }
+        }
       })
+
+    connection
       .onCustom("metals/executeClientCommand", { params: js.Dynamic =>
         params.command.toString match {
           case "metals-logs-toggle" =>
@@ -94,6 +101,7 @@ object Metals extends ScalaLanguageServer { server =>
         if client.shouldStartForEditor(editor)
         uri <- editor.getURI
       } yield {
+        // send didFocusTextDocument notification to Metals
         client
           .getConnectionForEditor(editor).toFuture
           .foreach { connectionOrUndef =>
@@ -106,6 +114,14 @@ object Metals extends ScalaLanguageServer { server =>
                 )
             }
           }
+      }
+
+      // Remove status when switching to unrelated tabs
+      val shouldSync = editorOrUndef.fold(false) {
+        client.shouldSyncForEditor(_, projectPath)
+      }
+      if (!shouldSync) {
+        client.statusBarTile.innerHTML = ""
       }
     }
   }
