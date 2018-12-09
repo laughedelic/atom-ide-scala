@@ -5,6 +5,7 @@ import org.scalajs.dom, dom.raw.Element
 import laughedelic.atom.Atom
 import laughedelic.atom.config._
 import laughedelic.atom.languageclient.ActiveServer
+import scala.concurrent._, ExecutionContext.Implicits.global
 
 // For matching glob patterns
 @js.native @JSImport("minimatch", JSImport.Namespace)
@@ -13,21 +14,19 @@ object minimatch extends js.Object {
 }
 
 // For rendering Metals Doctor output
-class HtmlView(title: String, html: String) extends js.Object {
-
+class HtmlView(title: String) extends js.Object {
+  // any view that will be open in a tab needs to have a title
   def getTitle(): String = title
 
-  def getViewClass(): Element = {
-    val div = dom.document.createElement("div")
-    div.innerHTML = html
-    div
-  }
+  lazy val div = dom.document.createElement("div")
+
+  def getViewClass(): Element = div
 }
 
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "0.2.11"
+  val defaultVersion: String = "0.3.1"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
@@ -61,33 +60,47 @@ object Metals extends ScalaLanguageServer { server =>
     "doctor-run" -> "Run doctor",
   )
 
+  lazy val doctorView = new HtmlView("Metals Doctor")
+
   override def postInitialization(client: ScalaLanguageClient, activeServer: ActiveServer): Unit = {
-    activeServer
-      .connection
-      .asInstanceOf[js.Dynamic]
+    val projectPath = activeServer.projectPath
+    val connection = activeServer.connection.asInstanceOf[js.Dynamic]
+
+    connection
       .onCustom("metals/status", { params: js.Dynamic =>
-        client.statusBarTile.innerHTML = params.text.toString
+        Atom.workspace.getActiveTextEditor().foreach { editor =>
+          if (client.isFileInProject(editor, projectPath)) {
+            client.statusBarTile.innerHTML = params.text.toString
+          }
+        }
       })
 
-    activeServer
-      .connection
-      .asInstanceOf[js.Dynamic]
+    // HtmlView needs to be registered so that Atom knows how to render it
+    Atom.asInstanceOf[js.Dynamic]
+      .views
+      .addViewProvider(
+        { _.getViewClass }: js.Function1[HtmlView, Element]
+      )
+
+    connection
       .onCustom("metals/executeClientCommand", { params: js.Dynamic =>
         params.command.toString match {
           case "metals-logs-toggle" =>
             dispatchAtomCommand("console:toggle")
           case "metals-diagnostics-focus" =>
             dispatchAtomCommand("diagnostics:toggle-table")
+          case "metals-doctor-reload" =>
+            doctorView.div.innerHTML = params.arguments.toString
           case "metals-doctor-run" => {
-            val html = params.arguments.toString
-            Atom.asInstanceOf[js.Dynamic]
-              .views
-              .addViewProvider({ _.getViewClass }: js.Function1[HtmlView, Element])
+            doctorView.div.innerHTML = params.arguments.toString
             Atom.workspace.asInstanceOf[js.Dynamic]
+              .getCenter()
               .getActivePane()
-              .activateItem(new HtmlView("Metals Doctor", html))
+              .activateItem(doctorView, js.Dynamic.literal(pending = true))
           }
-          case _ => {}
+          case _ => client.logger.warn(
+            s"Uknown Metals client command: ${js.JSON.stringify(params)}"
+          )
         }
       })
 
@@ -97,11 +110,27 @@ object Metals extends ScalaLanguageServer { server =>
         if client.shouldStartForEditor(editor)
         uri <- editor.getURI
       } yield {
-        val fileUri = new java.net.URI("file", "", uri, null)
-        activeServer
-          .connection
-          .asInstanceOf[js.Dynamic]
-          .sendCustomNotification("metals/didFocusTextDocument", fileUri.toString)
+        // send didFocusTextDocument notification to Metals
+        client
+          .getConnectionForEditor(editor).toFuture
+          .foreach { connectionOrUndef =>
+            connectionOrUndef.foreach { connection =>
+              val fileUri = new java.net.URI("file", "", uri, null)
+              connection.asInstanceOf[js.Dynamic]
+                .sendCustomNotification(
+                  "metals/didFocusTextDocument",
+                  fileUri.toString
+                )
+            }
+          }
+      }
+
+      // Remove status when switching to unrelated tabs
+      val shouldSync = editorOrUndef.filter { editor =>
+        client.isFileInProject(editor, projectPath)
+      }.nonEmpty
+      if (!shouldSync) {
+        client.statusBarTile.innerHTML = ""
       }
     }
   }
