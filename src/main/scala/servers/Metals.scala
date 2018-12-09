@@ -14,15 +14,13 @@ object minimatch extends js.Object {
 }
 
 // For rendering Metals Doctor output
-class HtmlView(title: String, html: String) extends js.Object {
-
+class HtmlView(title: String) extends js.Object {
+  // any view that will be open in a tab needs to have a title
   def getTitle(): String = title
 
-  def getViewClass(): Element = {
-    val div = dom.document.createElement("div")
-    div.innerHTML = html
-    div
-  }
+  lazy val div = dom.document.createElement("div")
+
+  def getViewClass(): Element = div
 }
 
 object Metals extends ScalaLanguageServer { server =>
@@ -62,6 +60,8 @@ object Metals extends ScalaLanguageServer { server =>
     "doctor-run" -> "Run doctor",
   )
 
+  lazy val doctorView = new HtmlView("Metals Doctor")
+
   override def postInitialization(client: ScalaLanguageClient, activeServer: ActiveServer): Unit = {
     val projectPath = activeServer.projectPath
     val connection = activeServer.connection.asInstanceOf[js.Dynamic]
@@ -75,9 +75,12 @@ object Metals extends ScalaLanguageServer { server =>
         }
       })
 
+    // HtmlView needs to be registered so that Atom knows how to render it
     Atom.asInstanceOf[js.Dynamic]
       .views
-      .addViewProvider({ _.getViewClass }: js.Function1[HtmlView, Element])
+      .addViewProvider(
+        { _.getViewClass }: js.Function1[HtmlView, Element]
+      )
 
     connection
       .onCustom("metals/executeClientCommand", { params: js.Dynamic =>
@@ -86,17 +89,18 @@ object Metals extends ScalaLanguageServer { server =>
             dispatchAtomCommand("console:toggle")
           case "metals-diagnostics-focus" =>
             dispatchAtomCommand("diagnostics:toggle-table")
-          case "metals-doctor-run" | "metals-doctor-reload" => {
-            val html = params.arguments.toString
+          case "metals-doctor-reload" =>
+            doctorView.div.innerHTML = params.arguments.toString
+          case "metals-doctor-run" => {
+            doctorView.div.innerHTML = params.arguments.toString
             Atom.workspace.asInstanceOf[js.Dynamic]
               .getCenter()
               .getActivePane()
-              .activateItem(
-                new HtmlView("Metals Doctor", html),
-                js.Dynamic.literal(pending = true)
-              )
+              .activateItem(doctorView, js.Dynamic.literal(pending = true))
           }
-          case _ => {}
+          case _ => client.logger.warn(
+            s"Uknown Metals client command: ${js.JSON.stringify(params)}"
+          )
         }
       })
 
