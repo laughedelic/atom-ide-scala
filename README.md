@@ -27,14 +27,15 @@ During development some reusable parts were split into separate repos:
 
 ## Installation
 
-Open the [package page](https://atom.io/packages/ide-scala) and click the green _Install_ button. Or run this command:
+First, you need to install [language-scala](https://github.com/atom-community/language-scala) for basic Scala syntax highlighting. Then you can open the [package page](https://atom.io/packages/ide-scala) and click the green _Install_ button.
+
+Or you can run this command:
 
 ```
-apm install ide-scala
+apm install language-scala ide-scala
 ```
 
 On the first launch it will automatically install its dependencies if needed:
-+ [language-scala](https://github.com/atom-community/language-scala) for basic Scala syntax highlighting
 + [atom-ide-ui](https://github.com/facebook-atom/atom-ide-ui) for the Atom IDE interface
 
 ## Usage
