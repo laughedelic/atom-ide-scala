@@ -45,9 +45,8 @@ class ScalaLanguageClient extends AutoLanguageClient { client =>
       }
 
       case List(newServer) => {
-        val a = if (newServer == Ensime) "an" else "a"
         Atom.notifications.addSuccess(
-          s"Looks like ${a} **${newServer.name.capitalize}** project, launching language server...",
+          s"Looks like a **${newServer.name.capitalize}** project, launching language server...",
           new NotificationOptions(
             detail = projectPath,
             dismissable = false,

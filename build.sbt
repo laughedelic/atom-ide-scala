@@ -47,7 +47,7 @@ libraryDependencies ++= Seq(
 
 scalaJSLinkerConfig ~= {
   _.withSourceMap(true)
-    .withESFeatures(_.withUseECMAScript2015(true)) 
+    .withESFeatures(_.withUseECMAScript2015(true))
 }
 
 lazy val getCoursier = taskKey[File]("Get coursier binary if missing")
@@ -73,7 +73,6 @@ apmKeywords := Seq(
   "language-server-protocol",
   "metals",
   "dotty",
-  "ensime",
 )
 
 apmEngines := Map("atom" -> ">=1.25.0 <2.0.0")
@@ -82,7 +81,6 @@ apmDependencies := Map(
   "atom-languageclient" -> "0.9.9",
   "atom-package-deps" -> "5.0.0",
   "@atom/source-map-support" -> "0.3.4",
-  "s-expression" -> "3.0.3",
   "minimatch" -> "3.0.4",
 )
 

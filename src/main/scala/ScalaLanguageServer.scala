@@ -45,7 +45,6 @@ object ScalaLanguageServer {
   def fromName(name: String): Option[ScalaLanguageServer] =
     name match {
       case Metals.name | "scalameta" => Some(Metals)
-      case Ensime.name => Some(Ensime)
       case Dotty.name  => Some(Dotty)
       case _ => None
     }
