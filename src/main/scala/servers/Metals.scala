@@ -26,7 +26,7 @@ class HtmlView(title: String) extends js.Object {
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "0.3.1"
+  val defaultVersion: String = "0.5.2"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
@@ -39,12 +39,14 @@ object Metals extends ScalaLanguageServer { server =>
 
   override def javaExtraArgs(projectPath: String): Seq[String] =
     Config.metals.javaArgs.get.toSeq ++ Seq(
+      "-Dmetals.extensions=true",
       "-Dmetals.slow-task=status-bar",
       "-Dmetals.status-bar=on",
-      "-Dmetals.file-watcher=custom",
-      "-Dmetals.extensions=true",
-      "-Dmetals.icons=atom",
       "-Dmetals.execute-client-command=on",
+      "-Dmetals.icons=atom",
+      "-Dmetals.signature-help-command='signature-help:view'",
+      "-Dmetals.completion.command='autocomplete-plus:activate'",
+      // "-Dmetals.override-def-format=unicode",
     )
 
   def coursierArgs(projectPath: String): Seq[String] = Seq(
@@ -58,6 +60,9 @@ object Metals extends ScalaLanguageServer { server =>
     "build-connect" -> "Connect to build server",
     "sources-scan" -> "Rescan sources",
     "doctor-run" -> "Run doctor",
+    "compile-cascade" -> "Cascade compile",
+    "compile-cancel" -> "Cancel compilation",
+    "bsp-switch" -> "Switch build server",
   )
 
   lazy val doctorView = new HtmlView("Metals Doctor")
@@ -151,8 +156,7 @@ object MetalsConfig extends ConfigSchema {
       "-XX:+UseG1GC",
       "-XX:+UseStringDeduplication",
       "-Xss4m",
-      "-Xms1G",
-      "-Xmx4G",
+      "-Xms100m",
     )
   )
 
