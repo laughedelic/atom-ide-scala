@@ -26,7 +26,7 @@ class HtmlView(title: String) extends js.Object {
 object Metals extends ScalaLanguageServer { server =>
   val name: String = "metals"
   val description: String = "Metals"
-  val defaultVersion: String = "0.5.2"
+  val defaultVersion: String = "0.6.1"
 
   def trigger(projectPath: String): Boolean = {
     (projectPath / ".metals").isDirectory
@@ -107,6 +107,21 @@ object Metals extends ScalaLanguageServer { server =>
             s"Uknown Metals client command: ${js.JSON.stringify(params)}"
           )
         }
+      })
+
+    // Send windowStateDidChange notification to Metals every time window is in/out of focus
+    Atom.asInstanceOf[js.Dynamic].getCurrentWindow()
+      .on("focus", { _: js.Any =>
+        connection.sendCustomNotification(
+          "metals/windowStateDidChange",
+          js.Dynamic.literal("focused" -> true)
+        )
+      })
+      .on("blur", { _: js.Any =>
+        connection.sendCustomNotification(
+          "metals/windowStateDidChange",
+          js.Dynamic.literal("focused" -> false)
+        )
       })
 
     Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>
