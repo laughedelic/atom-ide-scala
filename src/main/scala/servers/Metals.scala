@@ -38,7 +38,7 @@ object Metals extends ScalaLanguageServer { server =>
   }
 
   override def javaExtraArgs(projectPath: String): Seq[String] =
-    Config.metals.javaArgs.get.toSeq ++ Seq(
+    Config.metals.`java-args`.get.toSeq ++ Seq(
       "-Dmetals.extensions=true",
       "-Dmetals.slow-task=status-bar",
       "-Dmetals.status-bar=on",
@@ -179,7 +179,19 @@ object MetalsConfig extends ConfigSchema {
     default = Metals.defaultVersion,
   )
 
-  val javaArgs = new Setting[js.Array[String]](
+  val `scalafmt-config-path` = new Setting[String](
+    title = "Scalafmt configuration",
+    description = "Should be relative to the workspace root directory and use forward slashes `/` for file separators (even on Windows).",
+    default = ".scalafmt.conf",
+  )
+
+  val `java-home` = new Setting[String](
+    title = "Java Home directory",
+    description = "The Java Home directory used for indexing JDK sources and locating the `java` binary. Metals will try to detect this setting automatically, but you can override it here if you need more flexibility.",
+    default = "",
+  )
+
+  val `java-args` = new Setting[js.Array[String]](
     title = "Extra JVM options",
     default = js.Array(
       "-XX:+UseG1GC",
@@ -187,6 +199,30 @@ object MetalsConfig extends ConfigSchema {
       "-Xss4m",
       "-Xms100m",
     )
+  )
+
+  val `sbt-script` = new Setting[String](
+    title = "sbt script",
+    description = "Optional absolute path to an `sbt` executable to use for running `sbt bloopInstall`. By default, Metals uses `java -jar sbt-launch.jar` with an embedded launcher while respecting `.jvmopts` and `.sbtopts`. Update this setting if your `sbt` script requires more customizations like using environment variables.",
+    default = "",
+  )
+
+  val `gradle-script` = new Setting[String](
+    title = "gradle script",
+    description = "Optional absolute path to a `gradle` executable to use for running `gradle bloopInstall`. By default, Metals uses gradlew with 5.3.1 gradle version. Update this setting if your `gradle` script requires more customizations like using environment variables.",
+    default = "",
+  )
+
+  val `maven-script` = new Setting[String](
+    title = "maven script",
+    description = "Optional absolute path to a `maven` executable to use for generating bloop config. By default, Metals uses `mvnw` maven wrapper with 3.6.1 maven version.. Update this setting if your `maven` script requires more customizations.",
+    default = "",
+  )
+
+  val `mill-script` = new Setting[String](
+    title = "mill script",
+    description = "Optional absolute path to a `mill` executable to use for running `mill mill.contrib.Bloop/install`. By default, Metals uses mill wrapper script with 0.4.0 mill version. Update this setting if your `mill` script requires more customizations like using environment variables.",
+    default = "",
   )
 
 }
