@@ -4,7 +4,7 @@ import scala.scalajs.js, js.annotation._
 import org.scalajs.dom, dom.raw.Element
 import laughedelic.atom.Atom
 import laughedelic.atom.config._
-import laughedelic.atom.languageclient.ActiveServer
+import laughedelic.atom.languageclient.{ActiveServer, LanguageClientConnection}
 import scala.concurrent._, ExecutionContext.Implicits.global
 
 // For matching glob patterns
@@ -69,9 +69,14 @@ object Metals extends ScalaLanguageServer { server =>
 
   override def postInitialization(client: ScalaLanguageClient, activeServer: ActiveServer): Unit = {
     val projectPath = activeServer.projectPath
-    val connection = activeServer.connection.asInstanceOf[js.Dynamic]
 
-    connection
+    // HtmlView needs to be registered so that Atom knows how to render it
+    Atom.asInstanceOf[js.Dynamic]
+      .views
+      .addViewProvider( { _.getViewClass }: js.Function1[HtmlView, Element] )
+
+    // Here we can use activeServer.connection to attach callbacks for custom LSP messages
+    activeServer.connection.asInstanceOf[js.Dynamic]
       .onCustom("metals/status", { params: js.Dynamic =>
         Atom.workspace.getActiveTextEditor().foreach { editor =>
           if (client.isFileInProject(editor, projectPath)) {
@@ -79,15 +84,7 @@ object Metals extends ScalaLanguageServer { server =>
           }
         }
       })
-
-    // HtmlView needs to be registered so that Atom knows how to render it
-    Atom.asInstanceOf[js.Dynamic]
-      .views
-      .addViewProvider(
-        { _.getViewClass }: js.Function1[HtmlView, Element]
-      )
-
-    connection
+    activeServer.connection.asInstanceOf[js.Dynamic]
       .onCustom("metals/executeClientCommand", { params: js.Dynamic =>
         params.command.toString match {
           case "metals-logs-toggle" =>
@@ -109,19 +106,36 @@ object Metals extends ScalaLanguageServer { server =>
         }
       })
 
+    // activeServer.connection will be disposed, so we need to ask for the active connection on demand
+    def withActiveConnection(action: LanguageClientConnection => Unit): Unit = {
+      Atom.workspace.getActiveTextEditor()
+        .filter(client.shouldStartForEditor)
+        .foreach { editor =>
+          client
+            .getConnectionForEditor(editor).toFuture
+            .foreach { connectionOrUndef =>
+              connectionOrUndef.foreach(action)
+            }
+        }
+    }
+
     // Send windowStateDidChange notification to Metals every time window is in/out of focus
     Atom.asInstanceOf[js.Dynamic].getCurrentWindow()
       .on("focus", { _: js.Any =>
-        connection.sendCustomNotification(
-          "metals/windowStateDidChange",
-          js.Dynamic.literal("focused" -> true)
-        )
+        withActiveConnection { connection =>
+          connection.asInstanceOf[js.Dynamic].sendCustomNotification(
+            "metals/windowStateDidChange",
+            js.Dynamic.literal("focused" -> true)
+          )
+        }
       })
       .on("blur", { _: js.Any =>
-        connection.sendCustomNotification(
-          "metals/windowStateDidChange",
-          js.Dynamic.literal("focused" -> false)
-        )
+        withActiveConnection { connection =>
+          connection.asInstanceOf[js.Dynamic].sendCustomNotification(
+            "metals/windowStateDidChange",
+            js.Dynamic.literal("focused" -> false)
+          )
+        }
       })
 
     Atom.workspace.onDidChangeActiveTextEditor { editorOrUndef =>
